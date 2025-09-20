@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Expo generated files
+dist/
+.expo/
+android/build/
+ios/build/
+build/
+*.log
+*.json
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# System specific files
+.DS_Store
+Thumbs.db
+
+# Other common files
+yarn-error.log
+npm-debug.log
+yarn-error.log
+.vscode/
