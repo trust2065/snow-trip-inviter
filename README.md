@@ -89,3 +89,17 @@ Set up a custom domain for your project to present the user with a clear relatio
 ### Google Cloud Auth - Production credential
 現在只有把debug的sha1加入Google Cloud Auth, 要上市的話還要生成production 然後生個新的Google Cloud Auth 的Clients, 並且加到Supabase
 https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=react-native
+
+
+記錄所有難點
+第一天
+- 用什麼技術 想用react native
+- 如何測試 Expo Go
+- 如何發佈 Expo Go
+- routing use file routing
+- styling 該死的卡在nativewind和file routing不能同時兼顧, 最後回頭用不習慣的寫法
+
+第二天
+- UI套件選擇 react native element 比較好看, 不喜歡react native paper風格
+  - 要給RNE一個themeWrapper 大解決困難
+- 登入 該死的Google login不能用Expo Go, 回頭用email login
