@@ -17,9 +17,17 @@ export default function HomeScreen() {
   const [snowboardLength, setSnowboardLength] = useState('');
 
   const addSnowboard = async () => {
+    const user = supabase.auth.getUser();
+    const userId = (await user).data.user?.id;
+
+    if (!user || !userId) {
+      Alert.alert('錯誤', '請先登入');
+      return;
+    }
+
     const { error } = await supabase.from('snowboards').insert([
       {
-        user_id: 'USER_ID', // 從 auth 取得
+        user_id: userId,
         brand: 'Burton',
         model: 'Custom',
         length: parseInt(snowboardLength, 10),
