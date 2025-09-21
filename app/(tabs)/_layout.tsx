@@ -20,21 +20,21 @@ export default function TabLayout() {
         name="home"
         options={{
           title: '選擇行程',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="todo"
         options={{
-          title: 'Home',
-          // tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '準備清單',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name='checkmark.square.fill' color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="me"
         options={{
-          title: 'Explore!',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '我的',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.circle.fill" color={color} />,
         }}
       />
     </Tabs>

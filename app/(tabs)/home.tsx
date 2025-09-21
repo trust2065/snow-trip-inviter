@@ -42,6 +42,51 @@ export default function TabThreeScreen() {
           <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
         </View>
       </Collapsible>
+      <Collapsible title="Thredbo 三日遊(9/27-29)">
+        <CheckBox
+          checked={checked}
+          onPress={toggleCheckbox}
+          iconType="material-community"
+          checkedIcon="checkbox-outline"
+          uncheckedIcon={'checkbox-blank-outline'}
+        />
+        <ThemedText>
+          週六中午出發, 預計滑雪兩天, 週一中午回程
+        </ThemedText>
+        <View style={styles.buttonsContainer}>
+          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+        </View>
+      </Collapsible>
+      <Collapsible title="Thredbo 三日遊(9/27-29)">
+        <CheckBox
+          checked={checked}
+          onPress={toggleCheckbox}
+          iconType="material-community"
+          checkedIcon="checkbox-outline"
+          uncheckedIcon={'checkbox-blank-outline'}
+        />
+        <ThemedText>
+          週六中午出發, 預計滑雪兩天, 週一中午回程
+        </ThemedText>
+        <View style={styles.buttonsContainer}>
+          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+        </View>
+      </Collapsible>
+      <Collapsible title="Thredbo 三日遊(9/27-29)">
+        <CheckBox
+          checked={checked}
+          onPress={toggleCheckbox}
+          iconType="material-community"
+          checkedIcon="checkbox-outline"
+          uncheckedIcon={'checkbox-blank-outline'}
+        />
+        <ThemedText>
+          週六中午出發, 預計滑雪兩天, 週一中午回程
+        </ThemedText>
+        <View style={styles.buttonsContainer}>
+          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+        </View>
+      </Collapsible>
     </ParallaxScrollView>
   );
 }
