@@ -102,4 +102,5 @@ https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platf
 第二天
 - UI套件選擇 react native element 比較好看, 不喜歡react native paper風格
   - 要給RNE一個themeWrapper 大解決困難
+- Supabase 不能用在web - 解決了
 - 登入 該死的Google login不能用Expo Go, 回頭用email login
