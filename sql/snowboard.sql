@@ -4,5 +4,6 @@ create table snowboards (
   brand text,
   model text,
   length int,
+  comment text,
   created_at timestamp default now()
 );
