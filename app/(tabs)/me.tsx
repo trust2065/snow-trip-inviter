@@ -1,13 +1,34 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { useState } from 'react';
+import Button from '../../components/ui/button';
+import supabase from '../utils/supabase';
+import Auth from '../../components/auth';
+import { Input } from '@rneui/themed';
 
+// 初始化 Supabase
 export default function HomeScreen() {
+  const [snowboardLength, setSnowboardLength] = useState('');
+
+  const addSnowboard = async () => {
+    const { error } = await supabase.from('snowboards').insert([
+      {
+        user_id: 'USER_ID', // 從 auth 取得
+        brand: 'Burton',
+        model: 'Custom',
+        length: parseInt(snowboardLength, 10),
+      },
+    ]);
+    if (error) Alert.alert('錯誤', error.message);
+    else Alert.alert('成功', '雪板已新增');
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -17,6 +38,18 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
+      <View style={{ padding: 20 }}>
+        <Auth />
+        {/* 雪板 */}
+        <Input
+          placeholder='雪板長度 (cm)'
+          value={snowboardLength}
+          onChangeText={setSnowboardLength}
+          keyboardType='numeric'
+        />
+        <Button title='新增雪板' onPress={addSnowboard} />
+      </View>
+
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />

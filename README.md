@@ -72,3 +72,20 @@ component
 要用tailwind要用nativewind
 但是他cli建出來專案的沒有用file routing, 但我想要
 所以我用回原本專案 就不用tailwind了 也可以啦
+
+## TODO
+
+### Deep link
+Deep link to force new user sign up with verification of email
+https://supabase.com/docs/guides/auth/native-mobile-deep-linking?platform=react-native 
+
+
+Note: 目前不用Google login, 因為他不支援Expo Go 這樣違背原本想用Expo Go測試的用意
+### Google cloud auth - custom domain
+note: this will be a paid feature
+https://supabase.com/docs/guides/auth/social-login/auth-google
+Set up a custom domain for your project to present the user with a clear relationship to the website they clicked Sign in with Google on.
+
+### Google Cloud Auth - Production credential
+現在只有把debug的sha1加入Google Cloud Auth, 要上市的話還要生成production 然後生個新的Google Cloud Auth 的Clients, 並且加到Supabase
+https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=react-native
