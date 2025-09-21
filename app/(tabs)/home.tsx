@@ -1,13 +1,11 @@
 import { Image } from 'expo-image';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
-import { CheckBox } from '@rneui/themed';
+import { CheckBox, Button } from '@rneui/themed';
 import { useState } from 'react';
 
 export default function TabThreeScreen() {
@@ -18,23 +16,17 @@ export default function TabThreeScreen() {
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
+        <Image
+          source={require('@/assets/images/icon.png')}
           style={styles.headerImage}
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          歡迎
-        </ThemedText>
       </ThemedView>
-      <ThemedText>行程列表</ThemedText>
+      <View style={styles.buttonsContainer}>
+        <Button style={styles.button} onPress={() => alert('click')} title="新增行程" />
+      </View>
+      <ThemedText type='title'>行程列表</ThemedText>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
         <CheckBox
           checked={checked}
@@ -43,13 +35,12 @@ export default function TabThreeScreen() {
           checkedIcon="checkbox-outline"
           uncheckedIcon={'checkbox-blank-outline'}
         />
-        <Image
-          source={require('@/assets/images/icon.png')}
-          style={{ width: 100, height: 100 }}
-        />
         <ThemedText>
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
+        <View style={styles.buttonsContainer}>
+          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+        </View>
       </Collapsible>
     </ParallaxScrollView>
   );
@@ -57,13 +48,22 @@ export default function TabThreeScreen() {
 
 const styles = StyleSheet.create({
   headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+    width: '100%',
+    height: 250,
   },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 20,
+  },
+  button: {
+    width: 120,
+  }
 });
