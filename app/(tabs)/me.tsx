@@ -10,7 +10,7 @@ import NumericInput from '../../components/ui/numeric-input';
 
 export default function HomeScreen() {
   const [snowboard, setSnowboard] = useState<{ length: number; comment?: string; id: string; } | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [snowboardForm, setSnowboardForm] = useState({
     length: '',
     comment: '',
@@ -252,8 +252,8 @@ function SnowboardForm({ form, onChange, onSubmit, onCancel, submitLabel = '儲�
         onChangeText={text => onChange('comment', text)}
       />
       <View style={{ flexDirection: 'row', gap: 10 }}>
+        {onCancel && <Button title='取消' onPress={onCancel} type='outline' />}
         <Button title={submitLabel} onPress={onSubmit} />
-        {onCancel && <Button title='取消' onPress={onCancel} />}
       </View>
     </View>
   );
