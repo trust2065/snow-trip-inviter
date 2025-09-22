@@ -179,19 +179,19 @@ export default function HomeScreen() {
               <View style={styles.gaps}>
                 <Text>雪板長度: {snowboard.length}</Text>
                 {snowboard.comment ? <Text>備註: {snowboard.comment}</Text> : null}
-                <Button
-                  title='編輯'
-                  onPress={() => {
-                    setSnowboardForm({
-                      length: String(snowboard.length),
-                      comment: snowboard.comment || ''
-                    });
-                    setIsEditing(true);
-                  }}
-                />
-                {/* <View style={{ marginTop: 20 }}>
-                  <Button title='刪除 ' onPress={deleteSnowboard} />
-                </View> */}
+                <View style={styles.buttons}>
+                  <Button
+                    title='編輯'
+                    onPress={() => {
+                      setSnowboardForm({
+                        length: String(snowboard.length),
+                        comment: snowboard.comment || ''
+                      });
+                      setIsEditing(true);
+                    }}
+                  />
+                  {/* <Button title='刪除 ' onPress={deleteSnowboard} /> */}
+                </View>
               </View>
             )}
           </>
