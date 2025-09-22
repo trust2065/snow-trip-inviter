@@ -167,28 +167,14 @@ export default function HomeScreen() {
         {(snowboard) ? (
           <>
             {isEditing ? (
-              <View>
-                <NumericInput
-                  label='雪板長度'
-                  placeholder='長度'
-                  value={snowboardForm.length}
-                  onChange={text =>
-                    setSnowboardForm(prev => ({ ...prev, length: text }))
-                  }
-                />
-                <Input
-                  label='備註'
-                  placeholder='備註'
-                  value={snowboardForm.comment}
-                  onChangeText={text =>
-                    setSnowboardForm(prev => ({ ...prev, comment: text }))
-                  }
-                />
-                <View style={styles.buttons}>
-                  <Button title='儲存' onPress={updateSnowboard} />
-                  <Button title='取消' onPress={() => setIsEditing(false)} />
-                </View>
-              </View>
+              <SnowboardForm
+                form={snowboardForm}
+                onChange={(field, value) =>
+                  setSnowboardForm(prev => ({ ...prev, [field]: value }))
+                }
+                onSubmit={updateSnowboard}
+                onCancel={() => setIsEditing(false)}
+              />
             ) : (
               <View style={styles.gaps}>
                 <Text>雪板長度: {snowboard.length}</Text>
@@ -210,24 +196,14 @@ export default function HomeScreen() {
             )}
           </>
         ) : (
-          <View>
-            <NumericInput
-              label='雪板長度'
-              placeholder='長度'
-              value={snowboardForm.length}
-              onChange={text =>
-                setSnowboardForm(prev => ({ ...prev, length: text }))
-              }
-            />
-            <Input
-              placeholder='備註'
-              value={snowboardForm.comment}
-              onChangeText={text =>
-                setSnowboardForm(prev => ({ ...prev, comment: text }))
-              }
-            />
-            <Button title='新增雪板' onPress={addSnowboard} />
-          </View>
+          <SnowboardForm
+            form={snowboardForm}
+            onChange={(field, value) =>
+              setSnowboardForm(prev => ({ ...prev, [field]: value }))
+            }
+            onSubmit={addSnowboard}
+            submitLabel='新增雪板'
+          />
         )}
       </View>
     </ParallaxScrollView>
@@ -251,3 +227,34 @@ const styles = StyleSheet.create({
   buttons: { flexDirection: 'row', gap: 16 },
   gaps: { gap: 16 },
 });
+
+type SnowboardFormProps = {
+  form: { length: string; comment: string; };
+  onChange: (field: 'length' | 'comment', value: string) => void;
+  onSubmit: () => void;
+  onCancel?: () => void;
+  submitLabel?: string;
+};
+
+function SnowboardForm({ form, onChange, onSubmit, onCancel, submitLabel = '儲存' }: SnowboardFormProps) {
+  return (
+    <View>
+      <NumericInput
+        label='雪板長度'
+        placeholder='長度'
+        value={form.length}
+        onChange={text => onChange('length', text)}
+      />
+      <Input
+        label='備註'
+        placeholder='備註'
+        value={form.comment}
+        onChangeText={text => onChange('comment', text)}
+      />
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Button title={submitLabel} onPress={onSubmit} />
+        {onCancel && <Button title='取消' onPress={onCancel} />}
+      </View>
+    </View>
+  );
+}
