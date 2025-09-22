@@ -104,3 +104,6 @@ https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platf
   - 要給RNE一個themeWrapper 大解決困難
 - Supabase 不能用在web - 解決了
 - 登入 該死的Google login不能用Expo Go, 回頭用email login
+
+TODO:
+login怎麼設計UI

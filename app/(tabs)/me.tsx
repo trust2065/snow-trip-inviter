@@ -5,17 +5,25 @@ import { useEffect, useState } from 'react';
 import Button from '../../components/ui/button';
 import supabase from '../utils/supabase';
 import { Input, Text } from '@rneui/themed';
+import Auth from '../../components/auth';
+import NumericInput from '../../components/ui/numeric-input';
 
 export default function HomeScreen() {
   const [snowboard, setSnowboard] = useState<{ length: number; comment?: string; id: string; } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [inputLength, setInputLength] = useState(''); // 新增 input state
+  const [snowboardForm, setSnowboardForm] = useState({
+    length: '',
+    comment: '',
+  });
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchSnowboard = async () => {
       setLoading(true);
 
       const { data: userData } = await supabase.auth.getUser();
+      setUserId(userData?.user?.id || null);
       const userId = userData?.user?.id;
       if (!userId) {
         console.log('User not logged in');
@@ -58,6 +66,10 @@ export default function HomeScreen() {
     }
   };
 
+  function toggleEdit() {
+    setIsEditing(!isEditing);
+  }
+
   const addSnowboard = async () => {
     setLoading(true);
     try {
@@ -68,7 +80,7 @@ export default function HomeScreen() {
         return;
       }
 
-      const lengthNum = parseInt(inputLength, 10);
+      const lengthNum = parseInt(snowboardForm.length, 10);
       if (isNaN(lengthNum) || lengthNum <= 0) {
         Alert.alert('錯誤', '請輸入有效長度');
         return;
@@ -93,11 +105,54 @@ export default function HomeScreen() {
     }
   };
 
+  const updateSnowboard = async () => {
+    if (!snowboard) {
+      console.log('No snowboard to update');
+      return;
+    }
+
+    const lengthNum = parseInt(snowboardForm.length, 10);
+    if (isNaN(lengthNum) || lengthNum <= 0) {
+      Alert.alert('錯誤', '請輸入有效長度');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 嘗試更新
+      const { data, error } = await supabase
+        .from('snowboards')
+        .update({ length: lengthNum, comment: snowboardForm.comment || null })
+        .eq('id', snowboard.id)
+        .select()
+        .single();
+
+      if (error) {
+        Alert.alert('錯誤', error.message);
+      } else {
+        setSnowboard(data);
+        setIsEditing(false);
+        setSnowboardForm({ length: '', comment: '' });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return (
     <View style={styles.container}>
       <ActivityIndicator size='large' color='#A1CEDC' />
     </View>
   );
+
+  if (!userId) {
+    return (
+      <View style={styles.container}>
+        登入
+        <Auth />
+      </View>
+    );
+  }
 
   return (
     <ParallaxScrollView
@@ -109,24 +164,67 @@ export default function HomeScreen() {
         />
       }>
       <View style={{ padding: 20 }}>
-        {snowboard ? (
+        {(snowboard) ? (
           <>
-            <View style={styles.flex}>
-              <Text>雪板長度: {snowboard.length}</Text>
-              {snowboard.comment ? <Text>備註: {snowboard.comment}</Text> : null}
-              <Button title='編輯' onPress={() => console.log('Edit tapped')} />
-            </View>
-            {/* <View style={{ marginTop: 20 }}>
-              <Button title='刪除 ' onPress={deleteSnowboard} />
-            </View> */}
+            {isEditing ? (
+              <View>
+                <NumericInput
+                  label='雪板長度'
+                  placeholder='長度'
+                  value={snowboardForm.length}
+                  onChange={text =>
+                    setSnowboardForm(prev => ({ ...prev, length: text }))
+                  }
+                />
+                <Input
+                  label='備註'
+                  placeholder='備註'
+                  value={snowboardForm.comment}
+                  onChangeText={text =>
+                    setSnowboardForm(prev => ({ ...prev, comment: text }))
+                  }
+                />
+                <View style={styles.buttons}>
+                  <Button title='儲存' onPress={updateSnowboard} />
+                  <Button title='取消' onPress={() => setIsEditing(false)} />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.gaps}>
+                <Text>雪板長度: {snowboard.length}</Text>
+                {snowboard.comment ? <Text>備註: {snowboard.comment}</Text> : null}
+                <Button
+                  title='編輯'
+                  onPress={() => {
+                    setSnowboardForm({
+                      length: String(snowboard.length),
+                      comment: snowboard.comment || ''
+                    });
+                    setIsEditing(true);
+                  }}
+                />
+                {/* <View style={{ marginTop: 20 }}>
+                  <Button title='刪除 ' onPress={deleteSnowboard} />
+                </View> */}
+              </View>
+            )}
           </>
         ) : (
           <View>
+            <NumericInput
+              label='雪板長度'
+              placeholder='長度'
+              value={snowboardForm.length}
+              onChange={text =>
+                setSnowboardForm(prev => ({ ...prev, length: text }))
+              }
+            />
             <Input
-              placeholder='雪板長度 (cm)'
-              value={inputLength}
-              onChangeText={setInputLength}
-              keyboardType='numeric'
+              placeholder='備註'
+              value={snowboardForm.comment}
+              onChangeText={text =>
+                setSnowboardForm(prev => ({ ...prev, comment: text }))
+              }
             />
             <Button title='新增雪板' onPress={addSnowboard} />
           </View>
@@ -150,4 +248,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   flex: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  buttons: { flexDirection: 'row', gap: 16 },
+  gaps: { gap: 16 },
 });

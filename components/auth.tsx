@@ -31,7 +31,7 @@ export default function Auth() {
       Alert.alert(error.message);
     } else {
       Alert.alert('Success', 'You are now signed in!');
-      console.log(user);
+      // console.log(user);
     }
 
     setLoading(false);
