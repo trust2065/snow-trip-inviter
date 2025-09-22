@@ -5,13 +5,10 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { CheckBox, Button } from '@rneui/themed';
+import { Button } from '@rneui/themed';
 import { useState } from 'react';
 
 export default function TabThreeScreen() {
-  const [checked, setChecked] = useState(true);
-  const toggleCheckbox = () => setChecked(!checked);
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -28,13 +25,6 @@ export default function TabThreeScreen() {
       </View>
       <ThemedText type='title'>行程列表</ThemedText>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <CheckBox
-          checked={checked}
-          onPress={toggleCheckbox}
-          iconType="material-community"
-          checkedIcon="checkbox-outline"
-          uncheckedIcon={'checkbox-blank-outline'}
-        />
         <ThemedText>
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
@@ -43,13 +33,6 @@ export default function TabThreeScreen() {
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <CheckBox
-          checked={checked}
-          onPress={toggleCheckbox}
-          iconType="material-community"
-          checkedIcon="checkbox-outline"
-          uncheckedIcon={'checkbox-blank-outline'}
-        />
         <ThemedText>
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
@@ -58,13 +41,6 @@ export default function TabThreeScreen() {
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <CheckBox
-          checked={checked}
-          onPress={toggleCheckbox}
-          iconType="material-community"
-          checkedIcon="checkbox-outline"
-          uncheckedIcon={'checkbox-blank-outline'}
-        />
         <ThemedText>
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
@@ -73,13 +49,6 @@ export default function TabThreeScreen() {
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <CheckBox
-          checked={checked}
-          onPress={toggleCheckbox}
-          iconType="material-community"
-          checkedIcon="checkbox-outline"
-          uncheckedIcon={'checkbox-blank-outline'}
-        />
         <ThemedText>
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
