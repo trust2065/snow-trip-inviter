@@ -60,11 +60,11 @@ button - join the trip(guest view)
 pages
 - create a new trip
 - trip detail
-- todo page
+- checklist page
 
 component 
 - trip detail component
-- todo items
+- checklist items
 
 
 ## Tech

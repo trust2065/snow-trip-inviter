@@ -24,7 +24,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="todo"
+        name="checklist"
         options={{
           title: '準備清單',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name='checkmark.square.fill' color={color} />,
