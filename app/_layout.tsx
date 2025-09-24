@@ -12,6 +12,7 @@ import Auth from '../components/auth';
 import { UserContext } from './contexts/user-context';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import supabase from './utils/supabase';
+import { SnackbarProvider } from './providers/snackbar-provider';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -31,7 +32,7 @@ function CenteredScreen({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-      backgroundColor,
+        backgroundColor,
       }}
     >
       {children}
@@ -73,28 +74,30 @@ export default function RootLayout() {
   const bgColor = isDarkTheme ? rneTheme.darkColors?.background ?? 'black' : rneTheme.lightColors?.background ?? 'white';
 
   return (
-    <NavThemeProvider value={navTheme}>
-      <RNEThemeProvider theme={rneTheme}>
-        <UserContext.Provider value={{ user }}>
-          {loading ? (
-            <CenteredScreen backgroundColor={bgColor}>
-              <ActivityIndicator size='large' />
-            </CenteredScreen>
-          ) : !user ? (
-            <CenteredScreen backgroundColor={bgColor}>
-              <Auth />
-            </CenteredScreen>
-          ) : (
-            <>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-              </Stack>
-              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            </>
-          )}
-        </UserContext.Provider>
-      </RNEThemeProvider>
-    </NavThemeProvider>
+    <SnackbarProvider>
+      <NavThemeProvider value={navTheme}>
+        <RNEThemeProvider theme={rneTheme}>
+          <UserContext.Provider value={{ user }}>
+            {loading ? (
+              <CenteredScreen backgroundColor={bgColor}>
+                <ActivityIndicator size='large' />
+              </CenteredScreen>
+            ) : !user ? (
+              <CenteredScreen backgroundColor={bgColor}>
+                <Auth />
+              </CenteredScreen>
+            ) : (
+              <>
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                </Stack>
+                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+              </>
+            )}
+          </UserContext.Provider>
+        </RNEThemeProvider>
+      </NavThemeProvider>
+    </SnackbarProvider>
   );
 }

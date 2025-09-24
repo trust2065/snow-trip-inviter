@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, View, AppState } from 'react-native';
+import { StyleSheet, View, AppState } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import supabase from '../app/utils/supabase';
+import { useSnackbar } from '../app/providers/snackbar-provider';
 
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
+// 讓 Supabase Auth 在前景自動刷新 Session
 AppState.addEventListener('change', (state) => {
   if (state === 'active') {
     supabase.auth.startAutoRefresh();
@@ -19,19 +17,20 @@ export default function Auth() {
   const [email, setEmail] = useState('trust2065@gmail.com');
   const [password, setPassword] = useState('123456');
   const [loading, setLoading] = useState(false);
+  const showSnackbar = useSnackbar();
 
   async function signInWithEmail() {
     setLoading(true);
-    const { error, data: { user } } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
     if (error) {
-      Alert.alert(error.message);
-    } else {
-      Alert.alert('Success', 'You are now signed in!');
-      // console.log(user);
+      showSnackbar('登入失敗: 未註冊/帳號密碼錯誤', { variant: 'error' });
+    } else if (data.user) {
+      showSnackbar('登入成功！', { variant: 'success' });
     }
 
     setLoading(false);
@@ -43,12 +42,13 @@ export default function Auth() {
       data: { session },
       error,
     } = await supabase.auth.signUp({
-      email: email,
-      password: password,
+      email,
+      password,
     });
 
-    if (error) Alert.alert(error.message);
-    if (!session) Alert.alert('成功加入');
+    if (error) showSnackbar(error.message, { variant: 'error' });
+    else showSnackbar('註冊成功！', { variant: 'success' });
+
     setLoading(false);
   }
 
@@ -76,10 +76,10 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+        <Button title="登入" disabled={loading} onPress={signInWithEmail} />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+        <Button title="註冊帳號" disabled={loading} onPress={signUpWithEmail} />
       </View>
     </View>
   );

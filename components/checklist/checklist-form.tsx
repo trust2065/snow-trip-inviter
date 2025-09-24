@@ -3,6 +3,7 @@ import { Alert, View } from 'react-native';
 import { Collapsible } from '../ui/collapsible';
 import MyCheckbox from './checkbox';
 import supabase from '../../app/utils/supabase';
+import { useSnackbar } from '../../app/providers/snackbar-provider';
 
 type OptionItem = {
   title: string;
@@ -17,6 +18,7 @@ type Section = {
 export default function ChecklistForm() {
   const [loading, setLoading] = useState(true);
   const [sections, setSections] = useState<Section[]>([]);
+  const showSnackbar = useSnackbar();
 
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -65,7 +67,7 @@ export default function ChecklistForm() {
         .maybeSingle();
 
       if (error) {
-        Alert.alert('錯誤', error.message);
+        showSnackbar('讀取清單失敗: ' + error.message, { variant: 'error' });
       } else if (data) {
         setSections(data.data);
       } else {

@@ -7,6 +7,7 @@ import supabase from '../utils/supabase';
 import { Input, Text } from '@rneui/themed';
 import Auth from '../../components/auth';
 import NumericInput from '../../components/ui/numeric-input';
+import { useSnackbar } from '../providers/snackbar-provider';
 
 export default function HomeScreen() {
   const [snowboard, setSnowboard] = useState<{ length: number; comment?: string; id: string; } | null>(null);
@@ -17,6 +18,7 @@ export default function HomeScreen() {
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const showSnackbar = useSnackbar();
 
   useEffect(() => {
     const fetchSnowboard = async () => {
@@ -39,7 +41,7 @@ export default function HomeScreen() {
         .maybeSingle();
 
       if (error) {
-        Alert.alert('錯誤', error.message);
+        showSnackbar('讀取失敗: ' + error.message, { variant: 'error' });
       } else if (data) {
         setSnowboard(data);
       }
@@ -57,7 +59,7 @@ export default function HomeScreen() {
     try {
       const { error } = await supabase.from('snowboards').delete().eq('id', snowboard.id);
       if (error) {
-        Alert.alert('錯誤', error.message);
+        showSnackbar('刪除失敗: ' + error.message, { variant: 'error' });
       } else {
         setSnowboard(null);
       }
@@ -76,29 +78,34 @@ export default function HomeScreen() {
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData?.user?.id;
       if (!userId) {
-        Alert.alert('錯誤', '請先登入');
+        showSnackbar('請先登入', { variant: 'error' });
         return;
       }
 
       const lengthNum = parseInt(snowboardForm.length, 10);
       if (isNaN(lengthNum) || lengthNum <= 0) {
-        Alert.alert('錯誤', '請輸入有效長度');
+        showSnackbar('請輸入有效長度', { variant: 'error' });
         return;
       }
 
-      const { data, error } = await supabase.from('snowboards').insert([
-        {
-          user_id: userId,
-          brand: 'Burton',
-          model: 'Custom',
-          length: lengthNum,
-        },
-      ]).select().single(); // 直接回傳新插入的資料
+      const { data, error } = await supabase
+        .from('snowboards')
+        .insert([
+          {
+            user_id: userId,
+            brand: 'Burton',
+            model: 'Custom',
+            length: lengthNum,
+          },
+        ])
+        .select()
+        .single();
 
       if (error) {
-        Alert.alert('錯誤', error.message);
+        showSnackbar('新增失敗: ' + error.message, { variant: 'error' });
       } else {
-        setSnowboard(data); // 更新 state → UI 自動切換成顯示模式
+        setSnowboard(data);
+        showSnackbar('新增成功', { variant: 'success' });
       }
     } finally {
       setLoading(false);
@@ -113,13 +120,12 @@ export default function HomeScreen() {
 
     const lengthNum = parseInt(snowboardForm.length, 10);
     if (isNaN(lengthNum) || lengthNum <= 0) {
-      Alert.alert('錯誤', '請輸入有效長度');
+      showSnackbar('請輸入有效長度', { variant: 'error' });
       return;
     }
 
     setLoading(true);
     try {
-      // 嘗試更新
       const { data, error } = await supabase
         .from('snowboards')
         .update({ length: lengthNum, comment: snowboardForm.comment || null })
@@ -128,11 +134,12 @@ export default function HomeScreen() {
         .single();
 
       if (error) {
-        Alert.alert('錯誤', error.message);
+        showSnackbar('更新失敗: ' + error.message, { variant: 'error' });
       } else {
         setSnowboard(data);
         setIsEditing(false);
         setSnowboardForm({ length: '', comment: '' });
+        showSnackbar('更新成功', { variant: 'success' });
       }
     } finally {
       setLoading(false);
