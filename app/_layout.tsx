@@ -17,20 +17,41 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+// 可重用的置中容器
+function CenteredScreen({
+  children,
+  backgroundColor,
+}: {
+  children: React.ReactNode;
+  backgroundColor: string;
+}) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      backgroundColor,
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const isDarkTheme = colorScheme === 'dark';
 
-  const navTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navTheme = isDarkTheme ? DarkTheme : DefaultTheme;
   const rneTheme = createTheme({
-    mode: colorScheme === 'dark' ? 'dark' : 'light',
+    mode: isDarkTheme ? 'dark' : 'light',
   });
 
-  // 儲存使用者與 Session 狀態
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 初始化檢查
     const initAuth = async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user ?? null);
@@ -38,7 +59,6 @@ export default function RootLayout() {
     };
     initAuth();
 
-    // 訂閱登入 / 登出事件
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event: AuthChangeEvent, session: Session | null) => {
         setUser(session?.user ?? null);
@@ -50,32 +70,20 @@ export default function RootLayout() {
     };
   }, []);
 
+  const bgColor = isDarkTheme ? rneTheme.darkColors?.background ?? 'black' : rneTheme.lightColors?.background ?? 'white';
+
   return (
     <NavThemeProvider value={navTheme}>
       <RNEThemeProvider theme={rneTheme}>
         <UserContext.Provider value={{ user }}>
           {loading ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: rneTheme.mode === 'dark' ? '#000' : '#fff',
-              }}
-            >
+            <CenteredScreen backgroundColor={bgColor}>
               <ActivityIndicator size='large' />
-            </View>
+            </CenteredScreen>
           ) : !user ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: rneTheme.mode === 'dark' ? '#000' : '#fff',
-              }}
-            >
+            <CenteredScreen backgroundColor={bgColor}>
               <Auth />
-            </View>
+            </CenteredScreen>
           ) : (
             <>
               <Stack>
