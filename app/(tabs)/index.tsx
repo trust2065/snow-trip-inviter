@@ -5,8 +5,8 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { Button } from '@rneui/themed';
-import { useState } from 'react';
+import { Button, Text } from '@rneui/themed';
+import supabase from '../utils/supabase';
 
 export default function TabThreeScreen() {
   return (
@@ -20,13 +20,18 @@ export default function TabThreeScreen() {
       }>
       <ThemedView style={styles.titleContainer}>
       </ThemedView>
+      <Button onPress={() => supabase.auth.signOut()}>Sign out</Button>
       <View style={styles.buttonsContainer}>
         <Button style={styles.button} onPress={() => alert('click')} title="新增行程" />
       </View>
       <ThemedText type='title'>行程列表</ThemedText>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
         <ThemedText>
-          週六中午出發, 預計滑雪兩天, 週一中午回程
+          <Text>雪場：[Thredbo]{'\n'}</Text>
+          <Text>住宿點：[Jindabyne]{'\n'}</Text>
+          <Text>日期：[1.01.2025 - 2.01.2025]{'\n'}</Text>
+          <Text>交通：[開車/接駁車]{'\n'}</Text>
+          <Text>雪具出租：[Monster]</Text>
         </ThemedText>
         <View style={styles.buttonsContainer}>
           <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />

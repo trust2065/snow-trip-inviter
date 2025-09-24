@@ -17,7 +17,7 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
       }}>
       <Tabs.Screen
-        name="trips"
+        name="index"
         options={{
           title: '選擇行程',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,

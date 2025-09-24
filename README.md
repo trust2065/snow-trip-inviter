@@ -107,3 +107,23 @@ https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platf
 
 TODO:
 login怎麼設計UI
+
+
+TODO:
+0. 行程detail
+1. Login => enter name and email
+2. Host view/Guest view => Host can edit trip, trip is from db
+3. Guest ready UI in trip
+4. Add checklist for family member, ready UI
+5. Join button
+
+V2
+1. Member 
+2. Family (shared same view)
+3. Google login/logout
+4. invite
+5. checklist 分行程
+
+v3
+1. 新增行程時, 可從預設選單選雪場 然後會給一個範例行程
+2. 
