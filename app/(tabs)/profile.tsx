@@ -170,7 +170,7 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <View style={{ padding: 20 }}>
+      <View>
         {(snowboard) ? (
           <>
             {isEditing ? (
@@ -212,6 +212,9 @@ export default function HomeScreen() {
             submitLabel='新增雪板'
           />
         )}
+      </View>
+      <View style={styles.gaps}>
+        <Button type='outline' onPress={() => supabase.auth.signOut()} title='登出'></Button>
       </View>
     </ParallaxScrollView>
   );

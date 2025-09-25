@@ -111,7 +111,7 @@ login怎麼設計UI
 
 TODO:
 0. 行程detail
-1. Login => enter name and email
+1. (done)Login => enter name and email
 2. Host view/Guest view => Host can edit trip, trip is from db
 3. Guest ready UI in trip
 4. Add checklist for family member, ready UI

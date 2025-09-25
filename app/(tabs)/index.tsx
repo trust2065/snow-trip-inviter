@@ -5,24 +5,27 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { Button, Text } from '@rneui/themed';
+import { Text } from '@rneui/themed';
+
 import supabase from '../utils/supabase';
+import Button from '../../components/ui/button';
 
 export default function TabThreeScreen() {
   return (
     <ParallaxScrollView
+    
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
         <Image
           source={require('@/assets/images/icon.png')}
           style={styles.headerImage}
         />
+      
       }>
       <ThemedView style={styles.titleContainer}>
       </ThemedView>
-      <Button onPress={() => supabase.auth.signOut()}>Sign out</Button>
       <View style={styles.buttonsContainer}>
-        <Button style={styles.button} onPress={() => alert('click')} title="新增行程" />
+        <Button onPress={() => alert('click')} title="新增行程" />
       </View>
       <ThemedText type='title'>行程列表</ThemedText>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
@@ -34,7 +37,7 @@ export default function TabThreeScreen() {
           <Text>雪具出租：[Monster]</Text>
         </ThemedText>
         <View style={styles.buttonsContainer}>
-          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+          <Button onPress={() => alert('todo 參加')} title="參加" />
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
@@ -42,7 +45,7 @@ export default function TabThreeScreen() {
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
         <View style={styles.buttonsContainer}>
-          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+          <Button onPress={() => alert('todo 參加')} title="參加" />
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
@@ -50,7 +53,7 @@ export default function TabThreeScreen() {
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
         <View style={styles.buttonsContainer}>
-          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+          <Button onPress={() => alert('todo 參加')} title="參加" />
         </View>
       </Collapsible>
       <Collapsible title="Thredbo 三日遊(9/27-29)">
@@ -58,7 +61,7 @@ export default function TabThreeScreen() {
           週六中午出發, 預計滑雪兩天, 週一中午回程
         </ThemedText>
         <View style={styles.buttonsContainer}>
-          <Button style={styles.button} onPress={() => alert('todo 參加')} title="參加" />
+          <Button onPress={() => alert('todo 參加')} title="參加" />
         </View>
       </Collapsible>
     </ParallaxScrollView>
