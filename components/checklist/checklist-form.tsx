@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { Collapsible } from '../ui/collapsible';
 import MyCheckbox from './checkbox';
 import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import { useUser } from '../../app/contexts/user-context';
+import { Button, Input } from '@rneui/themed';
 
 type OptionItem = {
   title: string;
@@ -16,17 +17,26 @@ type Section = {
   options: OptionItem[];
 };
 
+type ChecklistData = {
+  user_id: string;
+  trip_id: string;
+  member_name: string;
+  data: Section[];
+};
+
 type ChecklistProps = {
-  tripId: string;  // 新增 tripId
+  tripId: string;
 };
 
 export default function ChecklistForm({ tripId }: ChecklistProps) {
   const [loading, setLoading] = useState(true);
   const [sections, setSections] = useState<Section[]>([]);
+  const [checklists, setChecklists] = useState<ChecklistData[]>([]);
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [newMemberName, setNewMemberName] = useState('');
+
   const showSnackbar = useSnackbar();
   const { user } = useUser();
-  console.log(tripId);
-
   const userId = user?.id;
 
   const defaultChecklist: Section[] = [
@@ -53,62 +63,137 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       ],
     },
   ];
+
+  const fetchChecklists = async () => {
+    if (!tripId || !userId) return;
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from('checklist')
+      .select('*')
+      .eq('trip_id', tripId)
+      .eq('user_id', userId)
+      .order('member_name', { ascending: true });
+
+    if (error) {
+      showSnackbar('讀取 checklist 失敗: ' + error.message, { variant: 'error' });
+    } else if (data.length > 0) {
+      setChecklists(data as ChecklistData[]);
+      setSelectedMember(data[0].member_name);
+      setSections((data[0] as ChecklistData).data);
+    } else {
+      const initMemberName = '我';
+      // 初始化一個隊長自己的 checklist
+      const initial: ChecklistData = {
+        user_id: userId,
+        trip_id: tripId,
+        member_name: initMemberName,
+        data: defaultChecklist,
+      };
+      setChecklists([initial]);
+      setSelectedMember(initMemberName);
+      setSections(defaultChecklist);
+    }
+
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchChecklist = async () => {
-      setLoading(true);
-      if (!tripId) return;
-
-      if (!userId) {
-        console.log('User not logged in');
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('checklist')
-        .select('id, data')
-        .eq('user_id', userId)
-        .eq('trip_id', tripId)
-        .maybeSingle();
-
-      if (error) {
-        showSnackbar('讀取清單失敗: ' + error.message, { variant: 'error' });
-      } else if (data) {
-        setSections(data.data);
-      } else {
-        setSections(defaultChecklist);
-      }
-
-      setLoading(false);
-    };
-
-    fetchChecklist();
+    fetchChecklists();
   }, [tripId]);
 
-  //  toggle option 即時更新 state 並同步 DB
+  // 切換成員
+  const selectMember = (memberName: string) => {
+    const checklist = checklists.find((c) => c.member_name === memberName);
+    if (checklist) {
+      setSelectedMember(memberName);
+      setSections(checklist.data);
+    }
+  };
+
+  // 新增成員 checklist
+  const addMemberChecklist = async () => {
+    if (!newMemberName || !userId) return;
+
+    const exists = checklists.find((c) => c.member_name === newMemberName);
+    if (exists) {
+      showSnackbar('成員名稱已存在', { variant: 'error' });
+      return;
+    }
+
+    const newChecklist: ChecklistData = {
+      user_id: userId,
+      trip_id: tripId,
+      member_name: newMemberName,
+      data: defaultChecklist,
+    };
+
+    const { error } = await supabase
+      .from('checklist')
+      .upsert(newChecklist, { onConflict: 'user_trip_member_unique' });
+
+    if (error) {
+      showSnackbar('新增成員 checklist 失敗: ' + error.message, { variant: 'error' });
+    } else {
+      setChecklists([...checklists, newChecklist]);
+      setSelectedMember(newMemberName);
+      setSections(defaultChecklist);
+      setNewMemberName('');
+    }
+  };
+
+  // toggle option
   const toggleOption = async (sectionIndex: number, optionIndex: number) => {
     const newSections = [...sections];
     newSections[sectionIndex].options[optionIndex].checked =
       !newSections[sectionIndex].options[optionIndex].checked;
     setSections(newSections);
 
-    // 同步到 Supabase
+    if (!userId || !selectedMember) return;
+
     await supabase
       .from('checklist')
       .upsert(
-        { user_id: userId, trip_id: tripId, data: newSections },
-        { onConflict: 'user_trip_unique' }
+        {
+          user_id: userId,
+          trip_id: tripId,
+          member_name: selectedMember,
+          data: newSections,
+        },
+        { onConflict: 'user_trip_member_unique' }
       );
   };
 
   return (
-    <View style={{ gap: 16 }}>
+    <ScrollView style={{ gap: 16 }}>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        {checklists.map((c) => (
+          <Button
+            key={c.member_name}
+            title={c.member_name}
+            onPress={() => selectMember(c.member_name)}
+            buttonStyle={{
+              backgroundColor: selectedMember === c.member_name ? '#007BFF' : '#E0E0E0',
+            }}
+            titleStyle={{
+              color: selectedMember === c.member_name ? '#FFF' : '#333',
+            }}
+          />
+        ))}
+      </View>
+
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+        <Input
+          placeholder="新增成員名稱"
+          value={newMemberName}
+          onChangeText={setNewMemberName}
+          containerStyle={{ flex: 1 }}
+        />
+        <Button title="新增" onPress={addMemberChecklist} />
+      </View>
+
       {sections.map((section, sectionIndex) => (
-        <Collapsible
-          key={sectionIndex}
-          title={section.title}
-          opened={true}
-        >
+        <Collapsible key={sectionIndex} title={section.title} opened>
           {section.options.map((item, optionIndex) => (
             <MyCheckbox
               key={optionIndex}
@@ -119,6 +204,6 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
           ))}
         </Collapsible>
       ))}
-    </View>
+    </ScrollView>
   );
-};
+}

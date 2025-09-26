@@ -8,11 +8,13 @@ import { useSnackbar } from '@/app/providers/snackbar-provider';
 import { Button } from '@rneui/themed';
 
 type Trip = { id: string; title: string; dates: string; };
+type Member = { id: string; name: string; };
 
 export default function TabTwoScreen() {
   const showSnackbar = useSnackbar();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
 
   // 讀取使用者 trips
   const fetchTrips = async () => {
@@ -25,7 +27,15 @@ export default function TabTwoScreen() {
       showSnackbar('讀取行程失敗: ' + error.message, { variant: 'error' });
     } else if (data.length > 0) {
       setTrips(data);
-      setSelectedTripId(data[0].id); // 預設選最近一個
+      const firstTripId = data[0].id;
+      setSelectedTripId(firstTripId); // 預設選最近一個
+
+      const { data: members } = await supabase
+        .from('trip_members')
+        .select('id, name')
+        .eq('trip_id', firstTripId);
+
+      setMembers(members ?? []);
     }
   };
 
@@ -65,7 +75,7 @@ export default function TabTwoScreen() {
         </View>
       )}
 
-      {selectedTripId && <ChecklistForm tripId={selectedTripId} />}
+      {selectedTripId && <ChecklistForm tripId={selectedTripId} members={members} />}
 
     </ParallaxScrollView>
   );
