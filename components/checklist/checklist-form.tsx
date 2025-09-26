@@ -29,6 +29,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
   const [checklists, setChecklists] = useState<ChecklistData[]>([]);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+  const [addingMember, setAddingMember] = useState(false);
   const [editingName, setEditingName] = useState<string>('');
   const [showSelectMemberUI, setShowSelectMemberUI] = useState(false);
 
@@ -111,6 +112,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     setChecklists([...checklists, newChecklist]);
     setSelectedMemberId(newChecklist.member_id);
     setSections(defaultChecklist);
+    setEditingName('');
   };
 
   const editMember = async (memberId: string, newName: string) => {
@@ -182,33 +184,57 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
           </View>
           <View style={{ flexDirection: 'row', gap: 10, marginBottom: 32 }}>
             {checklists.map(c => (
-              editingMemberId === c.member_id ? (
-                <Input
-                  key={c.member_id}
-                  value={editingName}
-                  onChangeText={setEditingName}
-                  onSubmitEditing={() => editMember(c.member_id, editingName)}
-                  containerStyle={{ flex: 1 }}
-                />
-              ) : (
-                <MemberBubble
-                  key={c.member_id}
-                  name={c.member_name}
-                  selected={selectedMemberId === c.member_id}
-                  onPress={() => selectMember(c.member_id)}
-                  onLongPress={() => {
-                    setEditingMemberId(c.member_id);
-                    setEditingName(c.member_name);
-                  }}
-                />
-              )
+              <MemberBubble
+                key={c.member_id}
+                name={c.member_name}
+                selected={c.member_id === selectedMemberId}
+                onPress={() => selectMember(c.member_id)}
+                onLongPress={() => {
+                  setEditingMemberId(c.member_id);
+                  setEditingName(c.member_name);
+                }}
+              />
             ))}
             <MemberBubble
               name='+'
               selected={false}
-              onPress={() => addMemberChecklist(prompt('請輸入新成員名字') || '')}
+              onPress={() => setAddingMember(true)}
             />
           </View>
+          {addingMember && (
+            <View style={{ marginBottom: 16, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+              <Text>新成員名稱:</Text>
+              <Input
+                value={editingName}
+                onChangeText={setEditingName}
+                onSubmitEditing={() => addMemberChecklist(editingName)}
+                containerStyle={{ maxWidth: 200 }}
+              />
+              <Button
+                onPress={() => setAddingMember(false)}
+                title='取消'
+                type='outline'
+                width={60}
+              />
+            </View>
+          )}
+          {editingMemberId && (
+            <View style={{ marginBottom: 16, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+              <Text>新成員名稱:</Text>
+              <Input
+                value={editingName}
+                onChangeText={setEditingName}
+                onSubmitEditing={() => editMember(editingMemberId, editingName)}
+                containerStyle={{ maxWidth: 200 }}
+              />
+              <Button
+                onPress={() => setEditingMemberId(null)}
+                title='取消'
+                type='outline'
+                width={60}
+              />
+            </View>
+          )}
         </>
       )}
 
