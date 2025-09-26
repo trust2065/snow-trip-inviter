@@ -1,29 +1,30 @@
 // ChecklistForm.tsx
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView } from 'react-native';
+import { Text, Input } from '@rneui/themed';
 import { Collapsible } from '../ui/collapsible';
 import MyCheckbox from './checkbox';
+import { MemberBubble } from './member-bubble';
+import Button from '../ui/button';
 import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import { useUser } from '../../app/contexts/user-context';
-import { MemberBubble } from './member-bubble';
-import { Text, Input } from '@rneui/themed';
-import Button from '../ui/button';
 
-
+// ---------- Types ----------
 type OptionItem = { title: string; checked: boolean; };
 type Section = { title: string; options: OptionItem[]; };
 type ChecklistData = {
   id?: string;
   user_id: string;
   trip_id: string;
-  member_id: string;  // 用 id 做唯一 key
+  member_id: string;
   member_name: string;
   data: Section[];
 };
 
 type ChecklistProps = { tripId: string; };
 
+// ---------- Component ----------
 export default function ChecklistForm({ tripId }: ChecklistProps) {
   const [sections, setSections] = useState<Section[]>([]);
   const [checklists, setChecklists] = useState<ChecklistData[]>([]);
@@ -38,11 +39,31 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
   const showSnackbar = useSnackbar();
 
   const defaultChecklist: Section[] = [
-    { title: '裝備', options: [{ title: '雪鏡', checked: false }, { title: '手套', checked: false }, { title: '帽子', checked: false }] },
-    { title: '服裝', options: [{ title: '外套', checked: false }, { title: '褲子', checked: false }] },
-    { title: '其他', options: [{ title: '住宿訂房', checked: false }, { title: '雪票', checked: false }] },
+    {
+      title: '裝備',
+      options: [
+        { title: '雪鏡', checked: false },
+        { title: '手套', checked: false },
+        { title: '帽子', checked: false },
+      ],
+    },
+    {
+      title: '服裝',
+      options: [
+        { title: '外套', checked: false },
+        { title: '褲子', checked: false },
+      ],
+    },
+    {
+      title: '其他',
+      options: [
+        { title: '住宿訂房', checked: false },
+        { title: '雪票', checked: false },
+      ],
+    },
   ];
 
+  // ---------- Fetch ----------
   const fetchChecklists = async () => {
     if (!tripId || !userId) return;
 
@@ -54,18 +75,22 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       .order('member_name', { ascending: true });
 
     if (error) {
-      showSnackbar('讀取 checklist 失敗: ' + error.message, { variant: 'error' });
-    } else if (data.length > 0) {
+      showSnackbar('讀取 checklist 失敗: ' + error.message, {
+        variant: 'error',
+      });
+      return;
+    }
+
+    if (data.length > 0) {
       setChecklists(data as ChecklistData[]);
       setSelectedMemberId(data[0].member_id);
       setSections(data[0].data);
       setShowSelectMemberUI(data.length > 1);
     } else {
-      // 初始化自己
       const initChecklist: ChecklistData = {
         user_id: userId,
         trip_id: tripId,
-        member_id: crypto.randomUUID(), // 產生唯一 id
+        member_id: crypto.randomUUID(),
         member_name: '我',
         data: defaultChecklist,
       };
@@ -75,8 +100,11 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     }
   };
 
-  useEffect(() => { fetchChecklists(); }, [tripId]);
+  useEffect(() => {
+    fetchChecklists();
+  }, [tripId]);
 
+  // ---------- Actions ----------
   const selectMember = (memberId: string) => {
     const checklist = checklists.find(c => c.member_id === memberId);
     if (!checklist) return;
@@ -100,9 +128,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       data: defaultChecklist,
     };
 
-    const { error } = await supabase
-      .from('checklist')
-      .insert(newChecklist);
+    const { error } = await supabase.from('checklist').insert(newChecklist);
 
     if (error) {
       showSnackbar('新增成員失敗: ' + error.message, { variant: 'error' });
@@ -117,6 +143,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
 
   const editMember = async (memberId: string, newName: string) => {
     if (!userId || !memberId) return;
+
     if (checklists.some(c => c.member_name === newName)) {
       showSnackbar('成員名稱已存在', { variant: 'error' });
       return;
@@ -137,7 +164,9 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       return;
     }
 
-    setChecklists(checklists.map(c => c.member_id === memberId ? updated : c));
+    setChecklists(
+      checklists.map(c => (c.member_id === memberId ? updated : c))
+    );
     if (selectedMemberId === memberId) setSections(updated.data);
     setEditingMemberId(null);
   };
@@ -162,27 +191,39 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       return;
     }
 
-    setChecklists(checklists.map(c =>
-      c.member_id === selectedMemberId ? { ...c, data: newSections } : c
-    ));
+    setChecklists(
+      checklists.map(c =>
+        c.member_id === selectedMemberId ? { ...c, data: newSections } : c
+      )
+    );
     setSections(newSections);
   };
 
+  // ---------- Render ----------
   return (
     <ScrollView style={{ gap: 16 }}>
       {!showSelectMemberUI && (
         <View style={{ flex: 1, marginBottom: 16 }}>
           <Button
-            onPress={() => setShowSelectMemberUI(true)} title='新增成員'
+            onPress={() => setShowSelectMemberUI(true)}
+            title='新增成員'
           />
         </View>
       )}
+
       {showSelectMemberUI && (
         <>
           <View style={{ flex: 1, marginBottom: 16 }}>
             <Text>選擇成員</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 32 }}>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              marginBottom: 32,
+            }}
+          >
             {checklists.map(c => (
               <MemberBubble
                 key={c.member_id}
@@ -195,19 +236,29 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
                 }}
               />
             ))}
+
             <MemberBubble
               name='+'
               selected={false}
               onPress={() => setAddingMember(true)}
             />
           </View>
+
           {addingMember && (
-            <View style={{ marginBottom: 16, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+            <View
+              style={{
+                marginBottom: 16,
+                flexDirection: 'row',
+                gap: 10,
+                alignItems: 'center',
+              }}
+            >
               <Text>新成員名稱:</Text>
               <Input
                 value={editingName}
                 onChangeText={setEditingName}
                 onSubmitEditing={() => addMemberChecklist(editingName)}
+                returnKeyType='done'
                 containerStyle={{ maxWidth: 200 }}
               />
               <Button
@@ -218,13 +269,24 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
               />
             </View>
           )}
+
           {editingMemberId && (
-            <View style={{ marginBottom: 16, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+            <View
+              style={{
+                marginBottom: 16,
+                flexDirection: 'row',
+                gap: 10,
+                alignItems: 'center',
+              }}
+            >
               <Text>新成員名稱:</Text>
               <Input
                 value={editingName}
                 onChangeText={setEditingName}
-                onSubmitEditing={() => editMember(editingMemberId, editingName)}
+                onSubmitEditing={() =>
+                  editMember(editingMemberId, editingName)
+                }
+                returnKeyType='done'
                 containerStyle={{ maxWidth: 200 }}
               />
               <Button
@@ -237,7 +299,6 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
           )}
         </>
       )}
-
 
       {sections.map((section, si) => (
         <Collapsible key={si} title={section.title} opened>
