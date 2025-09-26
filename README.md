@@ -111,14 +111,14 @@ login怎麼設計UI
 
 TODO:
 0. (done) 行程detail/edit
-1. (done)Login => enter name and email
+1. (done) Login => enter name and email
 2. (done) Host view/Guest view => Host can edit trip, trip is from db
 3. Guest ready UI in trip
 4. Add checklist for family member, ready UI
 5. Join button
 
 V2
-1. Member 
+1. Member
 2. Family (shared same view)
 3. Google login/logout
 4. invite

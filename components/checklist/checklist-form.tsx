@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { Collapsible } from '../ui/collapsible';
 import MyCheckbox from './checkbox';
 import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
+import { useUser } from '../../app/contexts/user-context';
 
 type OptionItem = {
   title: string;
@@ -15,12 +16,18 @@ type Section = {
   options: OptionItem[];
 };
 
-export default function ChecklistForm() {
+type ChecklistProps = {
+  tripId: string;  // 新增 tripId
+};
+
+export default function ChecklistForm({ tripId }: ChecklistProps) {
   const [loading, setLoading] = useState(true);
   const [sections, setSections] = useState<Section[]>([]);
   const showSnackbar = useSnackbar();
+  const { user } = useUser();
+  console.log(tripId);
 
-  const [userId, setUserId] = useState<string | null>(null);
+  const userId = user?.id;
 
   const defaultChecklist: Section[] = [
     {
@@ -46,14 +53,11 @@ export default function ChecklistForm() {
       ],
     },
   ];
-
   useEffect(() => {
     const fetchChecklist = async () => {
       setLoading(true);
+      if (!tripId) return;
 
-      const { data: userData } = await supabase.auth.getUser();
-      setUserId(userData?.user?.id || null);
-      const userId = userData?.user?.id;
       if (!userId) {
         console.log('User not logged in');
         setLoading(false);
@@ -64,6 +68,7 @@ export default function ChecklistForm() {
         .from('checklist')
         .select('id, data')
         .eq('user_id', userId)
+        .eq('trip_id', tripId)
         .maybeSingle();
 
       if (error) {
@@ -78,7 +83,7 @@ export default function ChecklistForm() {
     };
 
     fetchChecklist();
-  }, []);
+  }, [tripId]);
 
   //  toggle option 即時更新 state 並同步 DB
   const toggleOption = async (sectionIndex: number, optionIndex: number) => {
@@ -91,8 +96,8 @@ export default function ChecklistForm() {
     await supabase
       .from('checklist')
       .upsert(
-        { user_id: userId, data: newSections },
-        { onConflict: 'user_id' }
+        { user_id: userId, trip_id: tripId, data: newSections },
+        { onConflict: 'user_trip_unique' }
       );
   };
 
