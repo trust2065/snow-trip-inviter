@@ -157,8 +157,8 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          source={require('@/assets/images/inviter_profile.png')}
+          style={styles.headerImage}
         />
       }>
       <View>
@@ -217,12 +217,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // 垂直置中
     alignItems: 'center',     // 水平置中
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  headerImage: {
+    width: '100%',
+    aspectRatio: 4,
   },
   flex: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   buttons: { flexDirection: 'row', gap: 16 },
