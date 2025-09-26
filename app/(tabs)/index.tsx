@@ -5,64 +5,83 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { Text } from '@rneui/themed';
+import { Text, Input } from '@rneui/themed';
 
-import supabase from '../utils/supabase';
 import Button from '../../components/ui/button';
+import { useState } from 'react';
+import { useUser } from '../contexts/user-context';
 
 export default function TabThreeScreen() {
+  const [tripInfo, setTripInfo] = useState(
+    '雪場：[Thredbo]\n住宿點：[Jindabyne]\n日期：[1.01.2025 - 2.01.2025]\n交通：[開車/接駁車]\n雪具出租：[Monster]'
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftText, setDraftText] = useState(tripInfo);
+  const { user } = useUser();
+  // todo: build user role system
+  const isAdmin = user?.email === 'trust2065@gmail.com';
+
+  const handleSave = () => {
+    setTripInfo(draftText);
+    setIsEditing(false);
+  };
+
   return (
     <ParallaxScrollView
-    
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
         <Image
           source={require('@/assets/images/icon.png')}
           style={styles.headerImage}
         />
-      
       }>
       <ThemedView style={styles.titleContainer}>
       </ThemedView>
-      <View style={styles.buttonsContainer}>
-        <Button onPress={() => alert('click')} title="新增行程" />
-      </View>
+      {isAdmin &&
+        <View style={styles.buttonsContainer}>
+          <Button onPress={() => alert('click')} title="新增行程" />
+        </View>
+      }
       <ThemedText type='title'>行程列表</ThemedText>
-      <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <ThemedText>
-          <Text>雪場：[Thredbo]{'\n'}</Text>
-          <Text>住宿點：[Jindabyne]{'\n'}</Text>
-          <Text>日期：[1.01.2025 - 2.01.2025]{'\n'}</Text>
-          <Text>交通：[開車/接駁車]{'\n'}</Text>
-          <Text>雪具出租：[Monster]</Text>
-        </ThemedText>
-        <View style={styles.buttonsContainer}>
-          <Button onPress={() => alert('todo 參加')} title="參加" />
-        </View>
-      </Collapsible>
-      <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <ThemedText>
-          週六中午出發, 預計滑雪兩天, 週一中午回程
-        </ThemedText>
-        <View style={styles.buttonsContainer}>
-          <Button onPress={() => alert('todo 參加')} title="參加" />
-        </View>
-      </Collapsible>
-      <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <ThemedText>
-          週六中午出發, 預計滑雪兩天, 週一中午回程
-        </ThemedText>
-        <View style={styles.buttonsContainer}>
-          <Button onPress={() => alert('todo 參加')} title="參加" />
-        </View>
-      </Collapsible>
-      <Collapsible title="Thredbo 三日遊(9/27-29)">
-        <ThemedText>
-          週六中午出發, 預計滑雪兩天, 週一中午回程
-        </ThemedText>
-        <View style={styles.buttonsContainer}>
-          <Button onPress={() => alert('todo 參加')} title="參加" />
-        </View>
+      <Collapsible title="Thredbo 三日遊(9/27-29)" opened>
+        {isEditing ? (
+          <View>
+            <Input
+              value={draftText}
+              onChangeText={setDraftText}
+              multiline
+              style={{
+                minHeight: 120,
+                borderColor: '#ccc',
+                borderWidth: 1,
+                padding: 8,
+                borderRadius: 8,
+              }}
+            />
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+              <Button title='儲存' onPress={handleSave} />
+              <Button type='outline' title='取消' onPress={() => setIsEditing(false)} />
+            </View>
+          </View>
+        ) : (
+          <View>
+            <ThemedText>
+              {tripInfo.split('\n').map((line, idx) => (
+                <Text key={idx}>{line}{'\n'}</Text>
+              ))}
+            </ThemedText>
+            {isAdmin ? (
+              <View style={styles.mt10}>
+                <Button title='編輯' onPress={() => setIsEditing(true)} />
+              </View>
+            ) : (
+              <View style={styles.buttonsContainer}>
+                <Button onPress={() => alert('todo 參加')} title="參加" />
+              </View>
+            )}
+          </View>
+        )}
       </Collapsible>
     </ParallaxScrollView>
   );
@@ -87,5 +106,6 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 120,
-  }
+  },
+  mt10: { marginTop: 10 },
 });
