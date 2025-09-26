@@ -6,26 +6,34 @@ import { useSnackbar } from '../../app/providers/snackbar-provider';
 import Button from '../ui/button';
 import { router } from 'expo-router';
 
-type TripData = {
+export type TripData = {
+  id?: string;
   title: string;
   location: string;
   accommodation: string;
   dates: string;
   transport: string;
-  gearRental: string;
+  gear_renting: string;
   notes: string;
 };
 
-export default function AddTripForm() {
-  const [draftTrip, setDraftTrip] = useState<TripData>({
-    title: '',
-    location: '',
-    accommodation: '',
-    dates: '',
-    transport: '',
-    gearRental: '',
-    notes: '',
-  });
+type TripFormProps = {
+  initialTrip?: TripData;
+  tripId?: string;
+};
+
+export default function TripForm({ initialTrip, tripId }: TripFormProps) {
+  const [draftTrip, setDraftTrip] = useState<TripData>(
+    initialTrip || {
+      title: '',
+      location: '',
+      accommodation: '',
+      dates: '',
+      transport: '',
+      gear_renting: '',
+      notes: '',
+    }
+  );
 
   const showSnackbar = useSnackbar();
 
@@ -41,36 +49,62 @@ export default function AddTripForm() {
       return;
     }
 
-    const { error } = await supabase
-      .from('trips')
-      .insert([{
-        user_id: userId,
-        title: draftTrip.title,
-        location: draftTrip.location,
-        accommodation: draftTrip.accommodation,
-        dates: draftTrip.dates,
-        transport: draftTrip.transport,
-        gear_renting: draftTrip.gearRental,
-        notes: draftTrip.notes,
-      }]);
+    let error;
+    if (tripId) {
+      // 編輯模式
+      const res = await supabase
+        .from('trips')
+        .update({
+          title: draftTrip.title,
+          location: draftTrip.location,
+          accommodation: draftTrip.accommodation,
+          dates: draftTrip.dates,
+          transport: draftTrip.transport,
+          gear_renting: draftTrip.gear_renting,
+          notes: draftTrip.notes,
+        })
+        .eq('id', tripId);
+      error = res.error;
+    } else {
+      // 新增模式
+      const res = await supabase
+        .from('trips')
+        .insert([{
+          user_id: userId,
+          title: draftTrip.title,
+          location: draftTrip.location,
+          accommodation: draftTrip.accommodation,
+          dates: draftTrip.dates,
+          transport: draftTrip.transport,
+          gear_renting: draftTrip.gear_renting,
+          notes: draftTrip.notes,
+        }]);
+      error = res.error;
+    }
 
     if (error) {
-      showSnackbar('新增行程失敗: ' + error.message, { variant: 'error' });
+      showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
     } else {
-      showSnackbar('行程新增成功', { variant: 'success' });
+      showSnackbar('行程儲存成功', { variant: 'success' });
+      router.back();
+    }
+  };
+
+  const handleCancel = () => {
+    if (initialTrip) {
+      setDraftTrip(initialTrip);
+    } else {
       setDraftTrip({
         title: '',
         location: '',
         accommodation: '',
         dates: '',
         transport: '',
-        gearRental: '',
+        gear_renting: '',
         notes: '',
       });
-
-      // return to previous screen
-      router.back();
     }
+    router.back();
   };
 
   return (
@@ -102,8 +136,8 @@ export default function AddTripForm() {
       />
       <Input
         label='雪具出租'
-        value={draftTrip.gearRental}
-        onChangeText={(text) => handleChange('gearRental', text)}
+        value={draftTrip.gear_renting}
+        onChangeText={(text) => handleChange('gear_renting', text)}
       />
       <Input
         label='備註'
@@ -114,21 +148,7 @@ export default function AddTripForm() {
 
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
         <Button title='儲存' onPress={handleSave} />
-        <Button
-          type='outline'
-          title='取消'
-          onPress={() =>
-            setDraftTrip({
-              title: '',
-              location: '',
-              accommodation: '',
-              dates: '',
-              transport: '',
-              gearRental: '',
-              notes: '',
-            })
-          }
-        />
+        <Button type='outline' title='取消' onPress={handleCancel} />
       </View>
     </View>
   );

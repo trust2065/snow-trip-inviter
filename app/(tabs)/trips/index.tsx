@@ -1,39 +1,44 @@
 import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
-
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { Text, Input } from '@rneui/themed';
-
 import Button from '@/components/ui/button';
-import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useCallback } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useUser } from '../../contexts/user-context';
+import supabase from '../../utils/supabase';
+import { TripData } from '../../../components/trip/trip-form';
 
 export default function TabThreeScreen() {
-  const [tripInfo, setTripInfo] = useState(
-    '雪場：[Thredbo]\n住宿點：[Jindabyne]\n日期：[1.01.2025 - 2.01.2025]\n交通：[開車/接駁車]\n雪具出租：[Monster]'
-  );
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [draftText, setDraftText] = useState(tripInfo);
+  const [trips, setTrips] = useState<TripData[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const router = useRouter();
 
-  // todo: build user role system
-  console.log(user?.email);
   const isAdmin = user?.role === 'admin';
 
-  const handleSave = () => {
-    setTripInfo(draftText);
-    setIsEditing(false);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchTrips();
+    }, [])
+  );
 
-  // function addTrip() {
-  //   router.push('/(tabs)/index/detail');
-  // }
+  const fetchTrips = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('trips')
+      .select('*')
+      .order('dates', { ascending: true });
+
+    if (error) {
+      console.error('讀取行程失敗', error);
+    } else {
+      setTrips(data);
+    }
+    setLoading(false);
+  };
 
   return (
     <ParallaxScrollView
@@ -44,9 +49,8 @@ export default function TabThreeScreen() {
           style={styles.headerImage}
         />
       }>
-      <ThemedView style={styles.titleContainer}>
-      </ThemedView>
-      {isAdmin &&
+      <ThemedView style={styles.titleContainer} />
+      {isAdmin && (
         <View style={styles.buttonsContainer}>
           <Button
             type='outline'
@@ -54,47 +58,28 @@ export default function TabThreeScreen() {
             onPress={() => router.push('/(tabs)/trips/add-trip')}
           />
         </View>
-      }
+      )}
       <ThemedText type='title'>行程列表</ThemedText>
-      <Collapsible title="Thredbo 三日遊(9/27-29)" opened>
-        {isEditing ? (
-          <View>
-            <Input
-              value={draftText}
-              onChangeText={setDraftText}
-              multiline
-              style={{
-                minHeight: 120,
-                borderColor: '#ccc',
-                borderWidth: 1,
-                padding: 8,
-                borderRadius: 8,
-              }}
-            />
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
-              <Button title='儲存' onPress={handleSave} />
-              <Button type='outline' title='取消' onPress={() => setIsEditing(false)} />
-            </View>
-          </View>
-        ) : (
-          <View>
+      {loading ? (
+        <ThemedText>讀取中...</ThemedText>
+      ) : (
+        trips.map((trip) => (
+          <Collapsible key={trip.id} title={trip.title} opened>
             <ThemedText>
-              {tripInfo.split('\n').map((line, idx) => (
-                <Text key={idx}>{line}{'\n'}</Text>
-              ))}
+              {`雪場：[${trip.location}]\n住宿：[${trip.accommodation}]\n日期：[${trip.dates}]\n交通：[${trip.transport}]\n雪具出租：[${trip.gear_renting}]\n備註：[${trip.notes}]`}
             </ThemedText>
             {isAdmin ? (
               <View style={styles.mt10}>
-                <Button title='編輯' onPress={() => setIsEditing(true)} />
+                <Button title='編輯' onPress={() => router.push(`/(tabs)/trips/edit/${trip.id}`)} />
               </View>
             ) : (
               <View style={styles.buttonsContainer}>
-                <Button onPress={() => alert('todo 參加')} title="參加" />
+                <Button title='參加' onPress={() => alert('todo 參加')} />
               </View>
             )}
-          </View>
-        )}
-      </Collapsible>
+          </Collapsible>
+        ))
+      )}
     </ParallaxScrollView>
   );
 }
@@ -115,9 +100,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginVertical: 20,
-  },
-  button: {
-    width: 120,
   },
   mt10: { marginTop: 10 },
 });

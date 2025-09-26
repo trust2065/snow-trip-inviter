@@ -1,9 +1,9 @@
 import { ScrollView } from 'react-native';
-import AddTripForm from '../../../components/trip/add-trip-form';
+import TripForm from '../../../components/trip/trip-form';
 export default function TabThreeScreen() {
   return (
     <ScrollView style={{ flex: 1, padding: 0 }}>
-      <AddTripForm />
+      <TripForm />
     </ScrollView>
   );
 }
