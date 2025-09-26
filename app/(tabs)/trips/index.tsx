@@ -70,10 +70,14 @@ export default function TabThreeScreen() {
             </ThemedText>
             {isAdmin ? (
               <View style={styles.mt10}>
-                <Button title='編輯' onPress={() => router.push(`/(tabs)/trips/edit/${trip.id}`)} />
+                <View style={styles.buttonsContainer}>
+                  <Button title='詳情' onPress={() => router.push(`/(tabs)/trips/details/${trip.id}`)} />
+                  <Button title='編輯' onPress={() => router.push(`/(tabs)/trips/edit/${trip.id}`)} />
+                </View>
               </View>
             ) : (
               <View style={styles.buttonsContainer}>
+                <Button title='詳情' onPress={() => router.push(`/(tabs)/trips/details/${trip.id}`)} />
                 <Button title='參加' onPress={() => alert('todo 參加')} />
               </View>
             )}
@@ -100,6 +104,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginVertical: 20,
+    gap: 16,
   },
   mt10: { marginTop: 10 },
 });

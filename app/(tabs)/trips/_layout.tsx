@@ -15,6 +15,10 @@ export default function TripLayout() {
         name="edit/[id]"
         options={{ title: '編輯行程' }}
       />
+      <Stack.Screen
+        name="details/[id]"
+        options={{ title: '行程詳情' }}
+      />
     </Stack>
   );
 }
