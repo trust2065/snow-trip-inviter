@@ -72,7 +72,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       .select('*')
       .eq('trip_id', tripId)
       .eq('user_id', userId)
-      .order('member_name', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (error) {
       showSnackbar('讀取 checklist 失敗: ' + error.message, {
@@ -181,22 +181,30 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     newSections[sectionIndex].options[optionIndex].checked =
       !newSections[sectionIndex].options[optionIndex].checked;
 
-    const { error } = await supabase
+    if (!checklist.id) {
+      console.log('no checklist id, should not happen.');
+      return;
+    }
+
+    const { data: updated, error } = await supabase
       .from('checklist')
       .update({ data: newSections })
-      .eq('id', selectedMemberId);
+      .eq('id', checklist.id)
+      .select()
+      .single();
 
     if (error) {
       showSnackbar('更新選項失敗: ' + error.message, { variant: 'error' });
       return;
     }
 
-    setChecklists(
-      checklists.map(c =>
-        c.member_id === selectedMemberId ? { ...c, data: newSections } : c
+    // 使用 DB 回傳結果更新 state
+    setChecklists(prev =>
+      prev.map(c =>
+        c.member_id === selectedMemberId ? (updated as ChecklistData) : c
       )
     );
-    setSections(newSections);
+    setSections((updated as ChecklistData).data);
   };
 
   // ---------- Render ----------
