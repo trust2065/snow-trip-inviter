@@ -8,7 +8,7 @@ import { useSnackbar } from '@/app/providers/snackbar-provider';
 import { Button } from '@rneui/themed';
 
 type Trip = { id: string; title: string; dates: string; };
-type Member = { id: string; name: string; };
+export type Member = { id: string; name: string; };
 
 export default function TabTwoScreen() {
   const showSnackbar = useSnackbar();

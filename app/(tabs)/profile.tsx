@@ -152,15 +152,6 @@ export default function HomeScreen() {
     </View>
   );
 
-  if (!userId) {
-    return (
-      <View style={styles.container}>
-        登入
-        <Auth />
-      </View>
-    );
-  }
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}

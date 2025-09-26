@@ -55,21 +55,25 @@ export default function RootLayout() {
   useEffect(() => {
     const initAuth = async () => {
       const { data } = await supabase.auth.getUser();
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user?.id)
-        .single();
 
-      if (profileError) {
-        console.error('取得角色失敗', profileError);
+      if (!!data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user?.id)
+          .single();
+
+        if (profileError) {
+          console.error('取得角色失敗', profileError);
+        }
+
+        const userWithRole = data.user
+          ? { ...data.user, role: profile?.role || 'user' }
+          : null;
+
+        setUser(userWithRole);
       }
 
-      const userWithRole = data.user
-        ? { ...data.user, role: profile?.role || 'user' }
-        : null;
-
-      setUser(userWithRole);
       setLoading(false);
     };
     initAuth();
