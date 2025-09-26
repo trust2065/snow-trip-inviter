@@ -1,22 +1,48 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+// MemberBubble.tsx
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 
 type MemberBubbleProps = {
   name: string;
   selected: boolean;
   onPress: () => void;
+  onLongPress?: () => void;
 };
 
-export const MemberBubble = ({ name, selected, onPress }: MemberBubbleProps) => {
+export const MemberBubble = ({ name, selected, onPress, onLongPress }: MemberBubbleProps) => {
+  const lastPress = React.useRef(0);
+  // Web 雙擊偵測
+  const handlePress = () => {
+    if (Platform.OS === 'web') {
+      const now = Date.now();
+      if (now - lastPress.current < 300) {
+        // 雙擊
+        console.log('雙擊');
+        onLongPress?.();
+      } else {
+        // 單擊
+        console.log('單擊');
+        onPress();
+      }
+      lastPress.current = now;
+    } else {
+      console.log('...');
+      // Mobile 直接用原生行為
+      onPress();
+    }
+  };
+
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
+      onLongPress={onLongPress}
       style={[
         styles.bubble,
         selected && styles.selectedBubble,
       ]}
     >
       <Text style={[styles.text, selected && styles.selectedText]}>
-        {name[0].toUpperCase()} {/* 用第一個字母，也可以全名 */}
+        {name.slice(0, 3).toUpperCase()}
       </Text>
     </TouchableOpacity>
   );
@@ -26,7 +52,7 @@ const styles = StyleSheet.create({
   bubble: {
     width: 50,
     height: 50,
-    borderRadius: 25, // 變成圓形
+    borderRadius: 25,
     backgroundColor: '#E0E0E0',
     justifyContent: 'center',
     alignItems: 'center',

@@ -5,16 +5,13 @@ import ChecklistForm from '@/components/checklist/checklist-form';
 import React, { useEffect, useState } from 'react';
 import supabase from '@/app/utils/supabase';
 import { useSnackbar } from '@/app/providers/snackbar-provider';
-import { Button } from '@rneui/themed';
+import { Button, Text } from '@rneui/themed';
 
 type Trip = { id: string; title: string; dates: string; };
-export type Member = { id: string; name: string; };
-
 export default function TabTwoScreen() {
   const showSnackbar = useSnackbar();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
 
   // 讀取使用者 trips
   const fetchTrips = async () => {
@@ -30,12 +27,12 @@ export default function TabTwoScreen() {
       const firstTripId = data[0].id;
       setSelectedTripId(firstTripId); // 預設選最近一個
 
-      const { data: members } = await supabase
-        .from('trip_members')
-        .select('id, name')
-        .eq('trip_id', firstTripId);
+      // const { data: members } = await supabase
+      //   .from('trip_members')
+      //   .select('id, name')
+      //   .eq('trip_id', firstTripId);
 
-      setMembers(members ?? []);
+      // setMembers(members ?? []);
     }
   };
 
@@ -56,26 +53,31 @@ export default function TabTwoScreen() {
       }>
 
       {trips.length > 1 && (
-        <View style={styles.buttonContainer}>
-          {trips.map((trip) => (
-            <Button
-              key={trip.id}
-              title={trip.title}
-              onPress={() => setSelectedTripId(trip.id)}
-              buttonStyle={[
-                styles.button,
-                trip.id === selectedTripId && styles.selectedButton,
-              ]}
-              titleStyle={[
-                styles.buttonText,
-                trip.id === selectedTripId && styles.selectedText,
-              ]}
-            />
-          ))}
-        </View>
+        <>
+          <View style={styles.buttonHeader}>
+            <Text>選擇行程</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            {trips.map((trip) => (
+              <Button
+                key={trip.id}
+                title={trip.title}
+                onPress={() => setSelectedTripId(trip.id)}
+                buttonStyle={[
+                  styles.button,
+                  trip.id === selectedTripId && styles.selectedButton,
+                ]}
+                titleStyle={[
+                  styles.buttonText,
+                  trip.id === selectedTripId && styles.selectedText,
+                ]}
+              />
+            ))}
+          </View>
+        </>
       )}
 
-      {selectedTripId && <ChecklistForm tripId={selectedTripId} members={members} />}
+      {selectedTripId && <ChecklistForm tripId={selectedTripId} />}
 
     </ParallaxScrollView>
   );
@@ -87,6 +89,9 @@ const styles = StyleSheet.create({
     bottom: -90,
     left: -35,
     position: 'absolute',
+  },
+  buttonHeader: {
+    flex: 1
   },
 
 
