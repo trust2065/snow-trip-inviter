@@ -4,6 +4,7 @@ import { Input } from '@rneui/themed';
 import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import Button from '../ui/button';
+import { router } from 'expo-router';
 
 type TripData = {
   title: string;
@@ -42,7 +43,16 @@ export default function AddTripForm() {
 
     const { error } = await supabase
       .from('trips')
-      .insert([{ user_id: userId, data: draftTrip }]);
+      .insert([{
+        user_id: userId,
+        title: draftTrip.title,
+        location: draftTrip.location,
+        accommodation: draftTrip.accommodation,
+        dates: draftTrip.dates,
+        transport: draftTrip.transport,
+        gear_renting: draftTrip.gearRental,
+        notes: draftTrip.notes,
+      }]);
 
     if (error) {
       showSnackbar('新增行程失敗: ' + error.message, { variant: 'error' });
@@ -57,6 +67,9 @@ export default function AddTripForm() {
         gearRental: '',
         notes: '',
       });
+
+      // return to previous screen
+      router.back();
     }
   };
 

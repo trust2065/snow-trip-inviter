@@ -15,9 +15,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
+      }}
+      initialRouteName='trips'
+    >
       <Tabs.Screen
-        name="index"
+        name="trips"
         options={{
           title: '選擇行程',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
@@ -36,6 +38,10 @@ export default function TabLayout() {
           title: '我的',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.circle.fill" color={color} />,
         }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{ href: null }} // 不顯示在 Tab Bar
       />
     </Tabs>
   );
