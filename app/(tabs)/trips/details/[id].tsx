@@ -1,14 +1,20 @@
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { Text, } from '@rneui/themed';
-import { useState, useEffect } from 'react';
-import { useLocalSearchParams, } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { useLocalSearchParams, useRouter, } from 'expo-router';
 import supabase from '@/app/utils/supabase';
+import { useUser } from '../../../contexts/user-context';
+import Button from '../../../../components/ui/button';
+import TripForm from '../../../../components/trip/trip-form';
 
 export default function TripDetailScreen() {
-  const params = useLocalSearchParams();
-  const tripId = params.id as string;
+  const { id: tripId } = useLocalSearchParams<{ id: string; }>();
+  const router = useRouter();
+  const { user } = useUser();
+  const isAdmin = user?.role === 'admin';
 
   const [trip, setTrip] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // 讀取 trip 資料
   const fetchTrip = async () => {
@@ -29,17 +35,42 @@ export default function TripDetailScreen() {
 
   return (
     <ScrollView style={{ padding: 16 }}>
-      (
-      <View>
-        <Text h4>{trip.title}</Text>
-        <Text>地點: {trip.location}</Text>
-        <Text>住宿: {trip.accommodation}</Text>
-        <Text>日期: {trip.dates}</Text>
-        <Text>交通: {trip.transport}</Text>
-        <Text>雪具出租: {trip.gear_renting}</Text>
-        <Text>備註: {trip.notes}</Text>
-      </View>
-      )
+      {isEditing ? (
+        <TripForm
+          initialTrip={{
+            title: trip.title,
+            location: trip.location,
+            accommodation: trip.accommodation,
+            dates: trip.dates,
+            transport: trip.transport,
+            gear_renting: trip.gear_renting,
+            notes: trip.notes,
+          }}
+          tripId={trip.id}
+        />
+      ) : (
+        <View style={{ gap: 8 }}>
+          <Text h4>{trip.title}</Text>
+          <Text>地點: {trip.location}</Text>
+          <Text>住宿: {trip.accommodation}</Text>
+          <Text>日期: {trip.dates}</Text>
+          <Text>交通: {trip.transport}</Text>
+          <Text>雪具出租: {trip.gear_renting}</Text>
+          <Text>備註: {trip.notes}</Text>
+
+          {isAdmin && (
+            <View style={styles.buttonContainer}>
+              <Button title="編輯" onPress={() => setIsEditing(true)} />
+            </View>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    marginTop: 20,
+  },
+});

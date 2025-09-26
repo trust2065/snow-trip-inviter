@@ -72,7 +72,6 @@ export default function TabThreeScreen() {
               <View style={styles.mt10}>
                 <View style={styles.buttonsContainer}>
                   <Button title='詳情' onPress={() => router.push(`/(tabs)/trips/details/${trip.id}`)} />
-                  <Button title='編輯' onPress={() => router.push(`/(tabs)/trips/edit/${trip.id}`)} />
                 </View>
               </View>
             ) : (
