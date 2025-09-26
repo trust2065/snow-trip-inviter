@@ -139,6 +139,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     setSelectedMemberId(newChecklist.member_id);
     setSections(defaultChecklist);
     setEditingName('');
+    setAddingMember(false);
   };
 
   const editMember = async (memberId: string, newName: string) => {
@@ -157,7 +158,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     const { error } = await supabase
       .from('checklist')
       .update({ member_name: newName })
-      .eq('id', memberId);
+      .eq('id', checklist.id);
 
     if (error) {
       showSnackbar('修改成員名稱失敗: ' + error.message, { variant: 'error' });
@@ -169,6 +170,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     );
     if (selectedMemberId === memberId) setSections(updated.data);
     setEditingMemberId(null);
+    setEditingName('');
   };
 
   const toggleOption = async (sectionIndex: number, optionIndex: number) => {
