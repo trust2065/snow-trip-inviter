@@ -14,8 +14,12 @@ AppState.addEventListener('change', (state) => {
 });
 
 export default function Auth() {
-  const [email, setEmail] = useState('trust2065@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [signingUp, setSigningUp] = useState(false);
+  const [name, setName] = useState<string>();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  // const [email, setEmail] = useState('trust2065@gmail.com');
+  // const [password, setPassword] = useState('123456');
   const [loading, setLoading] = useState(false);
   const showSnackbar = useSnackbar();
 
@@ -54,19 +58,31 @@ export default function Auth() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      {signingUp && (
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Input
+            // label="Name"
+            leftIcon={{ type: 'font-awesome-5', name: 'signature', color: '#ccc', size: 16 }}
+            onChangeText={(text) => setName(text)}
+            value={name}
+            placeholder="Name"
+            autoCapitalize={'none'}
+          />
+        </View>
+      )}
+      <View style={[styles.verticallySpaced]}>
         <Input
-          label="Email"
+          // label="Email"
           leftIcon={{ type: 'font-awesome', name: 'envelope', color: '#ccc', size: 16 }}
           onChangeText={(text) => setEmail(text)}
           value={email}
-          placeholder="email@address.com"
+          placeholder="Email@address.com"
           autoCapitalize={'none'}
         />
       </View>
       <View style={styles.verticallySpaced}>
         <Input
-          label="Password"
+          // label="Password"
           leftIcon={{ type: 'font-awesome', name: 'lock', color: '#ccc', size: 20 }}
           onChangeText={(text) => setPassword(text)}
           value={password}
@@ -75,12 +91,25 @@ export default function Auth() {
           autoCapitalize={'none'}
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="登入" disabled={loading} onPress={signInWithEmail} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="註冊帳號" disabled={loading} onPress={signUpWithEmail} />
-      </View>
+      {signingUp ? (
+        <>
+          <View style={styles.verticallySpaced}>
+            <Button title="註冊" disabled={loading} onPress={signUpWithEmail} />
+          </View>
+          <View style={styles.verticallySpaced}>
+            <Button title="取消" disabled={loading} onPress={() => setSigningUp(false)} />
+          </View>
+        </>
+      ) : (
+        <>
+          <View style={[styles.verticallySpaced, styles.mt20]}>
+            <Button title="登入" disabled={loading} onPress={signInWithEmail} />
+          </View>
+          <View style={styles.verticallySpaced}>
+            <Button title="註冊新帳號" disabled={loading} onPress={() => setSigningUp(true)} />
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -88,7 +117,7 @@ export default function Auth() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
-    minWidth: '80%',
+    maxWidth: '80%',
     padding: 12,
   },
   verticallySpaced: {
