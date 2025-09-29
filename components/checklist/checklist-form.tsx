@@ -4,11 +4,11 @@ import { View, ScrollView } from 'react-native';
 import { Text, Input } from '@rneui/themed';
 import { Collapsible } from '../ui/collapsible';
 import MyCheckbox from './checkbox';
-import { MemberBubble } from './member-bubble';
 import Button from '../ui/button';
 import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import { useUser } from '../../app/contexts/user-context';
+import { SelectableBubble } from './selectable-bubble';
 
 // ---------- Types ----------
 type OptionItem = { title: string; checked: boolean; };
@@ -237,7 +237,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
             }}
           >
             {checklists.map(c => (
-              <MemberBubble
+              <SelectableBubble
                 key={c.member_id}
                 name={c.member_name}
                 selected={c.member_id === selectedMemberId}
@@ -249,7 +249,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
               />
             ))}
 
-            <MemberBubble
+            <SelectableBubble
               name='+'
               selected={false}
               onPress={() => setAddingMember(true)}

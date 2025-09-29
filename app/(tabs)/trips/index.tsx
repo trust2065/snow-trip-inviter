@@ -10,10 +10,9 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useUser } from '../../contexts/user-context';
 import supabase from '../../utils/supabase';
 import { TripData } from '../../../components/trip/trip-form';
-import { MemberBubble } from '../../../components/checklist/member-bubble';
 import Auth from '../../../components/auth';
 import { useSnackbar } from '../../providers/snackbar-provider';
-import { Text } from '@rneui/themed';
+import { ReadyBubble } from '../../../components/checklist/ready-bubble';
 
 export type DisplayTripData = TripData & {
   participants: {
@@ -142,10 +141,9 @@ export default function TabThreeScreen() {
               {trip.participants && trip.participants.length > 0 && (
                 <View style={[styles.flexRow, styles.mt10]}>
                   {trip.participants.map(p => (
-                    <MemberBubble
+                    <ReadyBubble
                       name={p.name}
-                      selected={false}
-                      readOnly
+                      showTick
                     />
                   ))}
                 </View>
