@@ -115,7 +115,10 @@ TODO:
 2. (done) Host view/Guest view => Host can edit trip, trip is from db
 3. Guest ready UI in trip
 4. Add checklist for family member, ready UI
-5. Join button
+5. (done) Join button
+(done) 參與者 改成圓形
+(done) 取消參加按鈕
+參加/取消不要refetch 畫面會閃
 
 V2
 1. Member
@@ -127,8 +130,3 @@ V2
 v3
 1. 新增行程時, 可從預設選單選雪場 然後會給一個範例行程
 2. 
-
-
-已經參加的 參加按鈕改成已經參加
-(done) 參與者 改成圓形
-(done) 取消參加按鈕

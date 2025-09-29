@@ -107,6 +107,12 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
   }, [tripId]);
 
   // ---------- Actions ----------
+  const isChecklistDone = (checklist: ChecklistData) => {
+    return checklist.data.every(section =>
+      section.options.every(opt => opt.checked)
+    );
+  };
+
   const selectMember = (memberId: string) => {
     const checklist = checklists.find(c => c.member_id === memberId);
     if (!checklist) return;
@@ -246,6 +252,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
                   setEditingMemberId(c.member_id);
                   setEditingName(c.member_name);
                 }}
+                showTick={isChecklistDone(c)}
               />
             ))}
 

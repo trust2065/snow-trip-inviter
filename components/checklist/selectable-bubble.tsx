@@ -7,6 +7,7 @@ type SelectableBubbleProps = {
   selected: boolean;
   onPress: () => void;
   onLongPress?: () => void;
+  showTick?: boolean;
 };
 
 export const SelectableBubble = ({
@@ -14,6 +15,7 @@ export const SelectableBubble = ({
   selected,
   onPress,
   onLongPress,
+  showTick,
 }: SelectableBubbleProps) => {
   return (
     <BaseBubble
@@ -21,6 +23,7 @@ export const SelectableBubble = ({
       selected={selected}
       onPress={onPress}
       onLongPress={onLongPress}
+      showTick={showTick}
     />
   );
 };
