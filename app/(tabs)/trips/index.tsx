@@ -10,14 +10,30 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useUser } from '../../contexts/user-context';
 import supabase from '../../utils/supabase';
 import { TripData } from '../../../components/trip/trip-form';
+import { MemberBubble } from '../../../components/checklist/member-bubble';
+import Auth from '../../../components/auth';
+import { useSnackbar } from '../../providers/snackbar-provider';
+import { Text } from '@rneui/themed';
+
+export type DisplayTripData = TripData & {
+  participants: {
+    id: string;
+    name: string;
+  }[];
+};
 
 export default function TabThreeScreen() {
-  const [trips, setTrips] = useState<TripData[]>([]);
+  const [trips, setTrips] = useState<DisplayTripData[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const router = useRouter();
+  const showSnackbar = useSnackbar();
 
-  const isAdmin = user?.role === 'admin';
+  if (!user) {
+    return <Auth />;
+  }
+
+  const isAdmin = user.role === 'admin';
 
   useFocusEffect(
     useCallback(() => {
@@ -32,16 +48,23 @@ export default function TabThreeScreen() {
       .select(`
       *,
       trip_participants (
-        profile_id
+        profiles (id, full_name)
       )
     `)
       .order('dates', { ascending: true });
 
     if (error) {
       console.error('讀取行程失敗', error);
-    } else {
-      setTrips(data);
+      return;
     }
+    const displayTrips: DisplayTripData[] = data?.map((trip: TripData) => ({
+      ...trip,
+      participants: trip.trip_participants?.map(p => ({
+        name: p.profiles?.full_name,
+        id: p.profiles?.id
+      })) ?? []
+    }));
+    setTrips(displayTrips);
     setLoading(false);
   };
 
@@ -51,16 +74,40 @@ export default function TabThreeScreen() {
       return;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('trip_participants')
-      .insert({ trip_id: tripId, profile_id: user?.id })
+      .insert({ trip_id: tripId, profile_id: user.id })
       .select();
 
     if (error) {
       console.error('加入行程失敗', error);
+      return;
     }
 
-    console.log(data);
+    await fetchTrips();
+    showSnackbar('加入行程成功', { variant: 'success' });
+  };
+
+  const dropTrip = async (tripId?: string) => {
+    if (!tripId) {
+      console.error('Should not happen, no trip id', trips);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('trip_participants')
+      .delete()
+      .eq('trip_id', tripId)
+      .eq('profile_id', user.id)
+      .select();
+
+    if (error) {
+      console.error('取消行程失敗', error);
+      return;
+    }
+
+    await fetchTrips();
+    showSnackbar('取消行程成功', { variant: 'success' });
   };
 
   return (
@@ -92,12 +139,16 @@ export default function TabThreeScreen() {
               {`雪場：[${trip.location}]\n住宿：[${trip.accommodation}]\n日期：[${trip.dates}]\n`}
             </ThemedText>
             <>
-              {trip.trip_participants && trip.trip_participants.length > 0 && (
-                <ThemedText>
-                  {`參與者：${trip.trip_participants
-                    .map((p: { profile_id: string; }) => p.profile_id)
-                    .join(', ')}`}
-                </ThemedText>
+              {trip.participants && trip.participants.length > 0 && (
+                <View style={[styles.flexRow, styles.mt10]}>
+                  {trip.participants.map(p => (
+                    <MemberBubble
+                      name={p.name}
+                      selected={false}
+                      readOnly
+                    />
+                  ))}
+                </View>
               )}
             </>
 
@@ -110,7 +161,18 @@ export default function TabThreeScreen() {
             ) : (
               <View style={styles.buttonsContainer}>
                 <Button title='詳情' onPress={() => router.push(`/(tabs)/trips/details/${trip.id}`)} />
-                <Button title='參加' onPress={() => joinTrip(trip.id)} />
+                {trip.participants?.map(p => p.id).includes(user.id) ? (
+                  <Button
+                    type='outline'
+                    title='取消參加'
+                    onPress={() => dropTrip(trip.id)}
+                  />
+                ) : (
+                  <Button
+                    title='參加'
+                    onPress={() => joinTrip(trip.id)}
+                  />
+                )}
               </View>
             )}
           </Collapsible>
@@ -126,6 +188,11 @@ const styles = StyleSheet.create({
     height: 250,
   },
   titleContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  flexRow: {
+    display: 'flex',
     flexDirection: 'row',
     gap: 8,
   },

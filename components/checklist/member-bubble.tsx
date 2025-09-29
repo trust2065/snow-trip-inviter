@@ -5,14 +5,19 @@ import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native
 type MemberBubbleProps = {
   name: string;
   selected: boolean;
-  onPress: () => void;
+  readOnly?: boolean;
+  onPress?: () => void;
   onLongPress?: () => void;
 };
 
-export const MemberBubble = ({ name, selected, onPress, onLongPress }: MemberBubbleProps) => {
+export const MemberBubble = ({ name, selected, readOnly, onPress, onLongPress }: MemberBubbleProps) => {
   const lastPress = React.useRef(0);
   // Web 雙擊偵測
   const handlePress = () => {
+    if (!onPress || readOnly) {
+      return;
+    }
+
     if (Platform.OS === 'web') {
       const now = Date.now();
       if (now - lastPress.current < 300) {

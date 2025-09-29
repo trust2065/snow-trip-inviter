@@ -46,6 +46,11 @@ export default function Auth() {
       data: { session },
       error,
     } = await supabase.auth.signUp({
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
       email,
       password,
     });
