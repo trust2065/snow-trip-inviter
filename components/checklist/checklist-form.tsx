@@ -67,11 +67,13 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
   const fetchChecklists = async () => {
     if (!tripId || !userId) return;
 
+    // user A is admin, has a checklist in trip 1
+    // user B is guest, has a checklist in trip 1
+    // user A, B should see both checklists
     const { data, error } = await supabase
       .from('checklist')
       .select('*')
       .eq('trip_id', tripId)
-      .eq('user_id', userId)
       .order('created_at', { ascending: true });
 
     if (error) {

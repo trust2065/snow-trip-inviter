@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 
 export type TripData = {
   id?: string;
+  trip_participants?: any[];
   title: string;
   location: string;
   accommodation: string;

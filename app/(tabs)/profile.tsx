@@ -8,6 +8,7 @@ import { Input, Text } from '@rneui/themed';
 import Auth from '../../components/auth';
 import NumericInput from '../../components/ui/numeric-input';
 import { useSnackbar } from '../providers/snackbar-provider';
+import { useUser } from '../contexts/user-context';
 
 export default function HomeScreen() {
   const [snowboard, setSnowboard] = useState<{ length: number; comment?: string; id: string; } | null>(null);
@@ -16,27 +17,22 @@ export default function HomeScreen() {
     length: '',
     comment: '',
   });
-  const [userId, setUserId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const showSnackbar = useSnackbar();
+  const { user } = useUser();
+
+  if (!user) {
+    return <Auth />;
+  }
 
   useEffect(() => {
     const fetchSnowboard = async () => {
       setLoading(true);
 
-      const { data: userData } = await supabase.auth.getUser();
-      setUserId(userData?.user?.id || null);
-      const userId = userData?.user?.id;
-      if (!userId) {
-        console.log('User not logged in');
-        setLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('snowboards')
         .select('id, length, comment')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .limit(1)
         .maybeSingle();
 
@@ -203,6 +199,11 @@ export default function HomeScreen() {
             submitLabel='新增雪板'
           />
         )}
+      </View>
+      <View style={{ marginTop: 32 }}>
+        <Text style={{ color: '#A1CEDC' }}>
+          你是: {user.email}
+        </Text>
       </View>
       <View style={styles.gaps}>
         <Button type='outline' onPress={() => supabase.auth.signOut()} title='登出'></Button>

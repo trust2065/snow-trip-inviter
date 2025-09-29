@@ -29,7 +29,12 @@ export default function TabThreeScreen() {
     setLoading(true);
     const { data, error } = await supabase
       .from('trips')
-      .select('*')
+      .select(`
+      *,
+      trip_participants (
+        profile_id
+      )
+    `)
       .order('dates', { ascending: true });
 
     if (error) {
@@ -38,6 +43,24 @@ export default function TabThreeScreen() {
       setTrips(data);
     }
     setLoading(false);
+  };
+
+  const joinTrip = async (tripId?: string) => {
+    if (!tripId) {
+      console.error('Should not happen, no trip id', trips);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('trip_participants')
+      .insert({ trip_id: tripId, profile_id: user?.id })
+      .select();
+
+    if (error) {
+      console.error('加入行程失敗', error);
+    }
+
+    console.log(data);
   };
 
   return (
@@ -66,8 +89,18 @@ export default function TabThreeScreen() {
         trips.map((trip) => (
           <Collapsible key={trip.id} title={trip.title} opened>
             <ThemedText>
-              {`雪場：[${trip.location}]\n住宿：[${trip.accommodation}]\n日期：[${trip.dates}]\n交通：[${trip.transport}]\n雪具出租：[${trip.gear_renting}]\n備註：[${trip.notes}]`}
+              {`雪場：[${trip.location}]\n住宿：[${trip.accommodation}]\n日期：[${trip.dates}]\n`}
             </ThemedText>
+            <>
+              {trip.trip_participants && trip.trip_participants.length > 0 && (
+                <ThemedText>
+                  {`參與者：${trip.trip_participants
+                    .map((p: { profile_id: string; }) => p.profile_id)
+                    .join(', ')}`}
+                </ThemedText>
+              )}
+            </>
+
             {isAdmin ? (
               <View style={styles.mt10}>
                 <View style={styles.buttonsContainer}>
@@ -77,7 +110,7 @@ export default function TabThreeScreen() {
             ) : (
               <View style={styles.buttonsContainer}>
                 <Button title='詳情' onPress={() => router.push(`/(tabs)/trips/details/${trip.id}`)} />
-                <Button title='參加' onPress={() => alert('todo 參加')} />
+                <Button title='參加' onPress={() => joinTrip(trip.id)} />
               </View>
             )}
           </Collapsible>
