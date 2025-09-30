@@ -51,10 +51,9 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
       return;
     }
 
-    let error;
     if (tripId) {
       // 編輯模式
-      const res = await supabase
+      const { error } = await supabase
         .from('trips')
         .update({
           title: draftTrip.title,
@@ -66,10 +65,17 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
           notes: draftTrip.notes,
         })
         .eq('id', tripId);
-      error = res.error;
+
+      if (error) {
+        showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
+        return;
+      }
+
+      showSnackbar('行程儲存成功', { variant: 'success' });
+      router.back();
     } else {
       // 新增模式
-      const res = await supabase
+      const { data: newTrip, error } = await supabase
         .from('trips')
         .insert([{
           user_id: userId,
@@ -80,16 +86,31 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
           transport: draftTrip.transport,
           gear_renting: draftTrip.gear_renting,
           notes: draftTrip.notes,
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
+        return;
+      }
+
+      // 新 trip 建立成功 → 插入 trip_participant
+      const { error: participantError } = await supabase
+        .from('trip_participants')
+        .insert([{
+          trip_id: newTrip.id,
+          profile_id: userId,
         }]);
-      error = res.error;
+
+      if (participantError) {
+        showSnackbar('建立參加者失敗: ' + participantError.message, { variant: 'error' });
+        return;
+      }
     }
 
-    if (error) {
-      showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
-    } else {
-      showSnackbar('行程儲存成功', { variant: 'success' });
-      router.back();
-    }
+    showSnackbar('行程儲存成功', { variant: 'success' });
+    router.back();
   };
 
   const handleCancel = () => {

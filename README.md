@@ -113,9 +113,13 @@ TODO:
 0. (done) 行程detail/edit
 1. (done) Login => enter name and email
 2. (done) Host view/Guest view => Host can edit trip, trip is from db
-3. Guest ready UI in trip
+3. (done) Guest ready UI in trip
+  - trip 可以看到user ready state, 只有在全員ready那個user才會顯示ready tick
 4. Add checklist for family member, ready UI
 5. (done) Join button
+(done) Checklist 應該只show 是user的那些 現在是全show的樣子 - 要從trip_participants 才能找到user參加的trips
+(done) 建立trip時, 就要insert 建立者user 到trip_participants
+(done) checklist再新增new trip後要refetch
 (done) 參與者 改成圓形
 (done) 取消參加按鈕
 參加/取消不要refetch 畫面會閃
@@ -131,4 +135,12 @@ V2
 
 v3
 1. 新增行程時, 可從預設選單選雪場 然後會給一個範例行程
-2. 
+2. 整理名稱 看下面notes
+2. user react query, 這樣比較好invalidate
+
+
+Notes:
+trip_participants = all trip users that has 'join' the trip, its 'profile_id' means 'user_id'
+trip_members = all members under an user
+profiles = users
+

@@ -18,6 +18,7 @@ export type DisplayTripData = TripData & {
   participants: {
     id: string;
     name: string;
+    ready: boolean;
   }[];
 };
 
@@ -45,24 +46,40 @@ export default function TabThreeScreen() {
     const { data, error } = await supabase
       .from('trips')
       .select(`
-      *,
-      trip_participants (
-        profiles (id, full_name)
-      )
-    `)
+        *,
+        trip_participants (
+          profiles (
+            id,
+            full_name,
+            checklist (
+              *
+            )
+          )
+        )
+      `)
       .order('dates', { ascending: true });
 
     if (error) {
       console.error('讀取行程失敗', error);
       return;
     }
-    const displayTrips: DisplayTripData[] = data?.map((trip: TripData) => ({
-      ...trip,
-      participants: trip.trip_participants?.map(p => ({
-        name: p.profiles?.full_name,
-        id: p.profiles?.id
-      })) ?? []
-    }));
+    const displayTrips: DisplayTripData[] = data?.map((trip: TripData) => {
+      return {
+        ...trip,
+        participants: trip.trip_participants?.map(p => {
+          const checklist = p.profiles.checklist;
+          const ready = checklist.length > 0 && checklist.every((c: any) => c?.data?.every(
+            (section: any) => section.options.every((opt: any) => opt.checked)
+          ));
+
+          return {
+            name: p.profiles?.full_name,
+            id: p.profiles?.id,
+            ready
+          };
+        }) ?? []
+      };
+    });
     setTrips(displayTrips);
     setLoading(false);
   };
@@ -143,7 +160,7 @@ export default function TabThreeScreen() {
                   {trip.participants.map(p => (
                     <ReadyBubble
                       name={p.name}
-                      showTick
+                      showTick={p.ready}
                     />
                   ))}
                 </View>

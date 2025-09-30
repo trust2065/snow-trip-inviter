@@ -1,27 +1,57 @@
 import { StyleSheet, View } from 'react-native';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import ChecklistForm from '@/components/checklist/checklist-form';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import supabase from '@/app/utils/supabase';
 import { useSnackbar } from '@/app/providers/snackbar-provider';
 import { Button, Text } from '@rneui/themed';
 import { Image } from 'expo-image';
+import { useUser } from '../contexts/user-context';
+import Auth from '../../components/auth';
+import { useFocusEffect } from 'expo-router';
 
 type Trip = { id: string; title: string; dates: string; };
 export default function TabTwoScreen() {
   const showSnackbar = useSnackbar();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const { user } = useUser();
 
-  // 讀取使用者 trips
+  if (!user) {
+    return (
+      <Auth />
+    );
+  }
+
+  // 讀取該user的所有trips
   const fetchTrips = async () => {
-    const { data, error } = await supabase
+    // 1️⃣ 取得參與users的 trip_ids
+    const { data: participants, error: partError } = await supabase
+      .from('trip_participants')
+      .select('trip_id')
+      .eq('profile_id', user.id);
+
+    if (partError) {
+      console.error(partError);
+      return;
+    }
+
+    const tripIds = participants?.map(p => p.trip_id) || [];
+
+    if (tripIds.length === 0) {
+      console.log('User is not participating in any trips');
+      return;
+    }
+
+    // 2️⃣ 用 trip_ids 抓 trips 詳細資料
+    const { data, error: tripsError } = await supabase
       .from('trips')
       .select('id, title, dates')
+      .in('id', tripIds)
       .order('dates', { ascending: false });
 
-    if (error) {
-      showSnackbar('讀取行程失敗: ' + error.message, { variant: 'error' });
+    if (tripsError) {
+      showSnackbar('讀取行程失敗: ' + tripsError.message, { variant: 'error' });
     } else if (data.length > 0) {
       setTrips(data);
       const firstTripId = data[0].id;
@@ -36,9 +66,11 @@ export default function TabTwoScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchTrips();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchTrips();
+    }, [user?.id])
+  );
 
   return (
     <ParallaxScrollView
@@ -50,11 +82,13 @@ export default function TabTwoScreen() {
         />
       }>
 
-      {trips.length > 1 && (
+      {(
         <>
-          <View style={styles.buttonHeader}>
-            <Text>選擇行程</Text>
-          </View>
+          {trips.length > 1 && (
+            <View style={styles.buttonHeader}>
+              <Text>選擇行程</Text>
+            </View>
+          )}
           <View style={styles.buttonContainer}>
             {trips.map((trip) => (
               <Button
