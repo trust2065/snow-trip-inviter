@@ -68,12 +68,14 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     if (!tripId || !userId) return;
 
     // user A is admin, has a checklist in trip 1
-    // user B is guest, has a checklist in trip 1
-    // user A, B should see both checklists
+    // member(not user) B is guest, has a checklist in trip 1
+    // user A should see both checklists
+    // member would not able to login in current design
     const { data, error } = await supabase
       .from('checklist')
       .select('*')
       .eq('trip_id', tripId)
+      .eq('user_id', userId)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -96,9 +98,23 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
         member_name: '我',
         data: defaultChecklist,
       };
-      setChecklists([initChecklist]);
-      setSelectedMemberId(initChecklist.member_id);
-      setSections(defaultChecklist);
+
+      const { data: inserted, error: insertError } = await supabase
+        .from('checklist')
+        .insert(initChecklist)
+        .select()
+        .single();
+
+      if (insertError) {
+        showSnackbar('建立 checklist 失敗: ' + insertError.message, {
+          variant: 'error',
+        });
+        return;
+      }
+
+      setChecklists([inserted as ChecklistData]);
+      setSelectedMemberId(inserted.member_id);
+      setSections(inserted.data);
     }
   };
 
@@ -136,15 +152,19 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       data: defaultChecklist,
     };
 
-    const { error } = await supabase.from('checklist').insert(newChecklist);
+    const { data: inserted, error } = await supabase
+      .from('checklist')
+      .insert(newChecklist)
+      .select()
+      .single();
 
     if (error) {
       showSnackbar('新增成員失敗: ' + error.message, { variant: 'error' });
       return;
     }
 
-    setChecklists([...checklists, newChecklist]);
-    setSelectedMemberId(newChecklist.member_id);
+    setChecklists([...checklists, inserted as ChecklistData]);
+    setSelectedMemberId(inserted.member_id);
     setSections(defaultChecklist);
     setEditingName('');
     setAddingMember(false);
@@ -196,6 +216,12 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       return;
     }
 
+    // 假設有user A, user B, member C
+    // user A加了member C
+
+    // 每個checklist有記錄user_id(隊長) 與 trip_id
+    // A登入時 要找到的是 A和C的checklist
+    // B登入時 要找到的是 B的checklist 
     const { data: updated, error } = await supabase
       .from('checklist')
       .update({ data: newSections })

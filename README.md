@@ -119,6 +119,8 @@ TODO:
 (done) 參與者 改成圓形
 (done) 取消參加按鈕
 參加/取消不要refetch 畫面會閃
+(done)新member無法直接點選checklist 要重新整理 - after insert, return inserted then update checklist list
+(done)新user無法點選checklist - insert new checklist, then add return id to checklist list
 
 V2
 1. Member
