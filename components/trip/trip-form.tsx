@@ -100,7 +100,7 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
         .from('trip_participants')
         .insert([{
           trip_id: newTrip.id,
-          profile_id: userId,
+          user_id: userId,
         }]);
 
       if (participantError) {

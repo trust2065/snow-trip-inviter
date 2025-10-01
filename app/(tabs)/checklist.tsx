@@ -29,7 +29,7 @@ export default function TabTwoScreen() {
     const { data: participants, error: partError } = await supabase
       .from('trip_participants')
       .select('trip_id')
-      .eq('profile_id', user.id);
+      .eq('user_id', user.id);
 
     if (partError) {
       console.error(partError);

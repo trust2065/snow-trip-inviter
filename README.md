@@ -125,8 +125,10 @@ TODO:
 參加/取消不要refetch 畫面會閃
 (done)新member無法直接點選checklist 要重新整理 - after insert, return inserted then update checklist list
 (done)新user無法點選checklist - insert new checklist, then add return id to checklist list
+Supabase typescript
 
 V2
+- 整理名稱 看下面notes
 1. Member
 2. Family (shared same view)
 3. Google login/logout
@@ -135,12 +137,9 @@ V2
 
 v3
 1. 新增行程時, 可從預設選單選雪場 然後會給一個範例行程
-2. 整理名稱 看下面notes
 2. user react query, 這樣比較好invalidate
 
 
 Notes:
-trip_participants = all trip users that has 'join' the trip, its 'profile_id' means 'user_id'
 trip_members = all members under an user
-profiles = users
 

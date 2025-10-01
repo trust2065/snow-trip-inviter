@@ -92,7 +92,7 @@ export default function TabThreeScreen() {
 
     const { error } = await supabase
       .from('trip_participants')
-      .insert({ trip_id: tripId, profile_id: user.id })
+      .insert({ trip_id: tripId, user_id: user.id })
       .select();
 
     if (error) {
@@ -114,7 +114,7 @@ export default function TabThreeScreen() {
       .from('trip_participants')
       .delete()
       .eq('trip_id', tripId)
-      .eq('profile_id', user.id)
+      .eq('user_id', user.id)
       .select();
 
     if (error) {
