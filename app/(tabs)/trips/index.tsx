@@ -13,6 +13,7 @@ import Auth from '../../../components/auth';
 import { useSnackbar } from '../../providers/snackbar-provider';
 import { ReadyBubble } from '../../../components/checklist/ready-bubble';
 import { Tables } from '../../../database.types';
+import { ChecklistRow } from '../../../json_types';
 
 type Trip = Tables<'trips'>;
 
@@ -70,9 +71,12 @@ export default function TabThreeScreen() {
       return {
         ...trip,
         participants: trip.trip_participants?.map(tp => {
-          const checklist = tp.profiles.checklist;
+          // 這裏的checklist是這個user所有的checklist, 所以要filter掉不是這個trip的
+          const checklistForThisTrip = tp.profiles.checklist
+            .filter((c): c is ChecklistRow => c.trip_id === trip.id);
+
           // calculate 'ready'
-          const ready = checklist.length > 0 && checklist.every((c: any) => c?.data?.every(
+          const ready = checklistForThisTrip.length > 0 && checklistForThisTrip.every((c: any) => c?.data?.every(
             (section: any) => section.options.every((opt: any) => opt.checked)
           ));
 
@@ -164,6 +168,7 @@ export default function TabThreeScreen() {
                 <View style={[styles.flexRow, styles.mt10]}>
                   {trip.participants.map(p => (
                     <ReadyBubble
+                      key={p.id}
                       name={p.name}
                       showTick={p.ready}
                     />
