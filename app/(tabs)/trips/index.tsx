@@ -9,12 +9,14 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useUser } from '../../contexts/user-context';
 import supabase from '../../utils/supabase';
-import { TripData } from '../../../components/trip/trip-form';
 import Auth from '../../../components/auth';
 import { useSnackbar } from '../../providers/snackbar-provider';
 import { ReadyBubble } from '../../../components/checklist/ready-bubble';
+import { Tables } from '../../../database.types';
 
-export type DisplayTripData = TripData & {
+type Trip = Tables<'trips'>;
+
+export type TripAndParticipants = Trip & {
   participants: {
     id: string;
     name: string;
@@ -23,7 +25,7 @@ export type DisplayTripData = TripData & {
 };
 
 export default function TabThreeScreen() {
-  const [trips, setTrips] = useState<DisplayTripData[]>([]);
+  const [trips, setTrips] = useState<TripAndParticipants[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const router = useRouter();
@@ -63,24 +65,27 @@ export default function TabThreeScreen() {
       console.error('讀取行程失敗', error);
       return;
     }
-    const displayTrips: DisplayTripData[] = data?.map((trip: TripData) => {
+
+    setTrips(data?.map((trip) => {
       return {
         ...trip,
-        participants: trip.trip_participants?.map(p => {
-          const checklist = p.profiles.checklist;
+        participants: trip.trip_participants?.map(tp => {
+          const checklist = tp.profiles.checklist;
+          // calculate 'ready'
           const ready = checklist.length > 0 && checklist.every((c: any) => c?.data?.every(
             (section: any) => section.options.every((opt: any) => opt.checked)
           ));
 
+          const { id, full_name: name } = tp.profiles;
+
           return {
-            name: p.profiles?.full_name,
-            id: p.profiles?.id,
+            id,
+            name,
             ready
           };
         }) ?? []
       };
-    });
-    setTrips(displayTrips);
+    }));
     setLoading(false);
   };
 

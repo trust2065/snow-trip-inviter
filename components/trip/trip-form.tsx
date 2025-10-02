@@ -5,11 +5,19 @@ import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import Button from '../ui/button';
 import { router } from 'expo-router';
+import type { TablesInsert, TablesUpdate } from '../../database.types';
 
-export type TripData = {
-  id?: string;
-  // TODO
-  trip_participants?: any[];
+type InsertTrip = TablesInsert<'trips'>;
+type UpdateTrip = TablesUpdate<'trips'>;
+
+type TripFormProps = {
+  initialTrip?: DraftTrip;
+  tripId?: string;
+};
+
+// create a type
+// because ex: location is string | null in db, but in <input> the value is string | undefined, therefore we can not use Trip type
+type DraftTrip = {
   title: string;
   location: string;
   accommodation: string;
@@ -19,13 +27,8 @@ export type TripData = {
   notes: string;
 };
 
-type TripFormProps = {
-  initialTrip?: TripData;
-  tripId?: string;
-};
-
 export default function TripForm({ initialTrip, tripId }: TripFormProps) {
-  const [draftTrip, setDraftTrip] = useState<TripData>(
+  const [draftTrip, setDraftTrip] = useState<DraftTrip>(
     initialTrip || {
       title: '',
       location: '',
@@ -39,7 +42,7 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
 
   const showSnackbar = useSnackbar();
 
-  const handleChange = (key: keyof TripData, value: string) => {
+  const handleChange = (key: keyof InsertTrip, value: string) => {
     setDraftTrip({ ...draftTrip, [key]: value });
   };
 
@@ -51,42 +54,45 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
       return;
     }
 
+    const { title, location, accommodation, dates, transport, gear_renting, notes } = draftTrip;
+
     if (tripId) {
-      // 編輯模式
+      // 編輯模式 → 用 UpdateTrip
+      const updatePayload: UpdateTrip = {
+        title,
+        location,
+        accommodation,
+        dates,
+        transport,
+        gear_renting,
+        notes,
+      };
+
       const { error } = await supabase
         .from('trips')
-        .update({
-          title: draftTrip.title,
-          location: draftTrip.location,
-          accommodation: draftTrip.accommodation,
-          dates: draftTrip.dates,
-          transport: draftTrip.transport,
-          gear_renting: draftTrip.gear_renting,
-          notes: draftTrip.notes,
-        })
+        .update(updatePayload)
         .eq('id', tripId);
 
       if (error) {
         showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
         return;
       }
-
-      showSnackbar('行程儲存成功', { variant: 'success' });
-      router.back();
     } else {
-      // 新增模式
+      // 新增模式 → 用 InsertTrip
+      const insertPayload: InsertTrip = {
+        user_id: userId,
+        title,
+        location,
+        accommodation,
+        dates,
+        transport,
+        gear_renting,
+        notes,
+      };
+
       const { data: newTrip, error } = await supabase
         .from('trips')
-        .insert([{
-          user_id: userId,
-          title: draftTrip.title,
-          location: draftTrip.location,
-          accommodation: draftTrip.accommodation,
-          dates: draftTrip.dates,
-          transport: draftTrip.transport,
-          gear_renting: draftTrip.gear_renting,
-          notes: draftTrip.notes,
-        }])
+        .insert([insertPayload])
         .select()
         .single();
 
