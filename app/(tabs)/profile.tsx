@@ -251,7 +251,7 @@ function SnowboardForm({ form, onChange, onSubmit, onCancel, submitLabel = '儲�
       />
       <Input
         label='備註'
-        placeholder='備註'
+        placeholder=''
         value={form.comment}
         onChangeText={text => onChange('comment', text)}
       />

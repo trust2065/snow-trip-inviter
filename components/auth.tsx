@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, AppState } from 'react-native';
+import { StyleSheet, View, AppState, Platform } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import supabase from '../app/utils/supabase';
 import { useSnackbar } from '../app/providers/snackbar-provider';
@@ -122,7 +122,17 @@ export default function Auth() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
-    maxWidth: '80%',
+    ...Platform.select({
+      ios: {
+        width: '80%',   // iOS 上直接用 width
+      },
+      android: {
+        width: '80%',   // Android 上同樣用 width
+      },
+      web: {
+        // maxWidth: '80%', // Web 上改成 maxWidth
+      },
+    }),
     padding: 12,
   },
   verticallySpaced: {
