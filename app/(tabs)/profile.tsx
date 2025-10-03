@@ -9,9 +9,13 @@ import Auth from '../../components/auth';
 import NumericInput from '../../components/ui/numeric-input';
 import { useSnackbar } from '../providers/snackbar-provider';
 import { useUser } from '../contexts/user-context';
+import Loading from '../../components/loading';
+import { Tables } from '../../database.types';
+
+type Snowboard = Pick<Tables<'snowboards'>, 'id' | 'length' | 'comment'>;
 
 export default function HomeScreen() {
-  const [snowboard, setSnowboard] = useState<{ length: number; comment?: string; id: string; } | null>(null);
+  const [snowboard, setSnowboard] = useState<Snowboard>();
   const [loading, setLoading] = useState(true);
   const [snowboardForm, setSnowboardForm] = useState({
     length: '',
@@ -57,7 +61,7 @@ export default function HomeScreen() {
       if (error) {
         showSnackbar('刪除失敗: ' + error.message, { variant: 'error' });
       } else {
-        setSnowboard(null);
+        setSnowboard(undefined);
       }
     } finally {
       setLoading(false);
@@ -143,9 +147,10 @@ export default function HomeScreen() {
   };
 
   if (loading) return (
-    <View style={styles.container}>
-      <ActivityIndicator size='large' color='#A1CEDC' />
-    </View>
+    <Loading />
+    // <View style={styles.container}>
+    //   <ActivityIndicator size='large' color='#A1CEDC' />
+    // </View>
   );
 
   return (

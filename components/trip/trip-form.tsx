@@ -13,6 +13,7 @@ type UpdateTrip = TablesUpdate<'trips'>;
 type TripFormProps = {
   initialTrip?: DraftTrip;
   tripId?: string;
+  setIsEditing?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // create a type
@@ -27,7 +28,7 @@ type DraftTrip = {
   notes: string;
 };
 
-export default function TripForm({ initialTrip, tripId }: TripFormProps) {
+export default function TripForm({ initialTrip, tripId, setIsEditing }: TripFormProps) {
   const [draftTrip, setDraftTrip] = useState<DraftTrip>(
     initialTrip || {
       title: '',
@@ -77,6 +78,9 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
         showSnackbar('儲存行程失敗: ' + error.message, { variant: 'error' });
         return;
       }
+
+      showSnackbar('行程儲存成功', { variant: 'success' });
+      setIsEditing?.(false);
     } else {
       // 新增模式 → 用 InsertTrip
       const insertPayload: InsertTrip = {
@@ -113,10 +117,11 @@ export default function TripForm({ initialTrip, tripId }: TripFormProps) {
         showSnackbar('建立參加者失敗: ' + participantError.message, { variant: 'error' });
         return;
       }
+
+      showSnackbar('行程儲存成功', { variant: 'success' });
+      router.back();
     }
 
-    showSnackbar('行程儲存成功', { variant: 'success' });
-    router.back();
   };
 
   const handleCancel = () => {

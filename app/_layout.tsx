@@ -13,32 +13,11 @@ import UserContext from './contexts/user-context';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import supabase from './utils/supabase';
 import SnackbarProvider from './providers/snackbar-provider';
+import CenteredScreen from '../components/centered-screen';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
-
-// 可重用的置中容器
-function CenteredScreen({
-  children,
-  backgroundColor,
-}: {
-  children: React.ReactNode;
-  backgroundColor: string;
-}) {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor,
-      }}
-    >
-      {children}
-    </View>
-  );
-}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

@@ -9,12 +9,17 @@ import { Image } from 'expo-image';
 import { useUser } from '../contexts/user-context';
 import Auth from '../../components/auth';
 import { useFocusEffect } from 'expo-router';
+import { Tables } from '../../database.types';
+import Loading from '../../components/loading';
 
-type Trip = { id: string; title: string; dates: string; };
+type Trip = Pick<Tables<'trips'>, 'id' | 'title' | 'dates'>;
+
 export default function TabTwoScreen() {
   const showSnackbar = useSnackbar();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const { user } = useUser();
 
   if (!user) {
@@ -25,6 +30,7 @@ export default function TabTwoScreen() {
 
   // 讀取該user的所有trips
   const fetchTrips = async () => {
+    setLoading(true);
     // 1️⃣ 取得參與users的 trip_ids
     const { data: participants, error: partError } = await supabase
       .from('trip_participants')
@@ -51,6 +57,7 @@ export default function TabTwoScreen() {
       .order('dates', { ascending: false });
 
     if (tripsError) {
+      setLoading(false);
       showSnackbar('讀取行程失敗: ' + tripsError.message, { variant: 'error' });
     } else if (data.length > 0) {
       setTrips(data);
@@ -64,6 +71,8 @@ export default function TabTwoScreen() {
 
       // setMembers(members ?? []);
     }
+
+    setLoading(false);
   };
 
   useFocusEffect(
@@ -71,6 +80,12 @@ export default function TabTwoScreen() {
       fetchTrips();
     }, [user?.id])
   );
+
+  if (loading) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <ParallaxScrollView
