@@ -6,8 +6,10 @@ type UserContextType = {
   user: User | null;
 };
 
-export const UserContext = createContext<UserContextType>({
+const UserContext = createContext<UserContextType>({
   user: null,
 });
 
 export const useUser = () => useContext(UserContext);
+
+export default UserContext;

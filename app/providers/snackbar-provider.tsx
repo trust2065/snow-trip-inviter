@@ -12,7 +12,7 @@ type SnackbarContextType = {
 
 const SnackbarContext = createContext<SnackbarContextType | undefined>(undefined);
 
-export function SnackbarProvider({ children }: { children: ReactNode; }) {
+export default function SnackbarProvider({ children }: { children: ReactNode; }) {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('');
   const [bgColour, setBgColour] = useState<'green' | 'red'>('green');

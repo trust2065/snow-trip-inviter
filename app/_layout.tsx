@@ -9,10 +9,10 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Auth from '../components/auth';
-import { UserContext } from './contexts/user-context';
+import UserContext from './contexts/user-context';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import supabase from './utils/supabase';
-import { SnackbarProvider } from './providers/snackbar-provider';
+import SnackbarProvider from './providers/snackbar-provider';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -108,7 +108,6 @@ export default function RootLayout() {
               <>
                 <Stack>
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="add-trip" options={{ title: '新增行程' }} />
                   <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
                 </Stack>
                 <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />

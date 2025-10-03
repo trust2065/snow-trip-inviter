@@ -115,7 +115,7 @@ TODO:
 2. (done) Host view/Guest view => Host can edit trip, trip is from db
 3. (done) Guest ready UI in trip
   - trip 可以看到user ready state, 只有在全員ready那個user才會顯示ready tick
-4. Add checklist for family member, ready UI
+4. (done) Add checklist for family member, each member will have ready UI when member's checklist is completed
 5. (done) Join button
 (done) Checklist 應該只show 是user的那些 現在是全show的樣子 - 要從trip_participants 才能找到user參加的trips
 (done) 建立trip時, 就要insert 建立者user 到trip_participants
@@ -128,7 +128,7 @@ TODO:
 (done) Supabase typescript
 
 V2
-- 整理名稱 看下面notes
+(done) - 整理名稱 看下面notes
 1. Member
 2. Family (shared same view)
 3. Google login/logout
