@@ -180,7 +180,7 @@ export default function TripForm({ initialTrip, tripId, setIsEditing }: TripForm
         onChangeText={(text) => handleChange('notes', text)}
       />
 
-      <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginVertical: 16 }}>
         <Button title='儲存' onPress={handleSave} />
         <Button type='outline' title='取消' onPress={handleCancel} />
       </View>

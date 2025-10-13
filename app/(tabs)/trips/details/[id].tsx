@@ -31,7 +31,7 @@ export default function TripDetailScreen() {
   }, [tripId]);
 
   return (
-    <View style={styles.container}>
+    <View>
       {(!trip)
         ? (
           <Text>讀取中...</Text>
@@ -53,7 +53,7 @@ export default function TripDetailScreen() {
                 setIsEditing={setIsEditing}
               />
             ) : (
-              <View style={{ gap: 16 }}>
+              <View style={styles.container}>
                 <Text h4>{trip.title}</Text>
                 <Text>地點: {trip.location}</Text>
                 <Text>住宿: {trip.accommodation}</Text>
@@ -77,9 +77,10 @@ export default function TripDetailScreen() {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    marginTop: 20,
+    marginTop: 24,
   },
   container: {
-    padding: 64
+    padding: 32,
+    gap: 16,
   },
 });
