@@ -108,9 +108,10 @@ export default function TabTwoScreen() {
             {trips.map((trip) => (
               <Button
                 key={trip.id}
+                type='clear'
                 title={trip.title}
                 onPress={() => setSelectedTripId(trip.id)}
-                buttonStyle={[
+                containerStyle={[
                   styles.button,
                   trip.id === selectedTripId && styles.selectedButton,
                 ]}
@@ -138,9 +139,8 @@ const styles = StyleSheet.create({
   buttonHeader: {
     flex: 1
   },
-
-
   button: {
+    borderRadius: 8,
     backgroundColor: '#E0E0E0', // 未選
   },
   selectedButton: {
