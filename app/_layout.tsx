@@ -14,6 +14,8 @@ import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import supabase from './utils/supabase';
 import SnackbarProvider from './providers/snackbar-provider';
 import CenteredScreen from '../components/centered-screen';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -71,30 +73,34 @@ export default function RootLayout() {
   const bgColor = isDarkTheme ? rneTheme.darkColors?.background ?? 'black' : rneTheme.lightColors?.background ?? 'white';
 
   return (
-    <SnackbarProvider>
-      <NavThemeProvider value={navTheme}>
-        <RNEThemeProvider theme={rneTheme}>
-          <UserContext.Provider value={{ user }}>
-            {loading ? (
-              <CenteredScreen backgroundColor={bgColor}>
-                <ActivityIndicator size='large' />
-              </CenteredScreen>
-            ) : !user ? (
-              <CenteredScreen backgroundColor={bgColor}>
-                <Auth />
-              </CenteredScreen>
-            ) : (
-              <>
-                <Stack>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-                </Stack>
-                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-              </>
-            )}
-          </UserContext.Provider>
-        </RNEThemeProvider>
-      </NavThemeProvider>
-    </SnackbarProvider>
+    <SafeAreaProvider>
+      <SnackbarProvider>
+        <NavThemeProvider value={navTheme}>
+          <RNEThemeProvider theme={rneTheme}>
+            <UserContext.Provider value={{ user }}>
+              <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: bgColor }}>
+                {loading ? (
+                  <CenteredScreen >
+                    <ActivityIndicator size='large' />
+                  </CenteredScreen>
+                ) : !user ? (
+                  <CenteredScreen >
+                    <Auth />
+                  </CenteredScreen>
+                ) : (
+                  <>
+                    <Stack>
+                      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                      <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                    </Stack>
+                    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                  </>
+                )}
+              </SafeAreaView>
+            </UserContext.Provider>
+          </RNEThemeProvider>
+        </NavThemeProvider>
+      </SnackbarProvider>
+    </SafeAreaProvider>
   );
 }
