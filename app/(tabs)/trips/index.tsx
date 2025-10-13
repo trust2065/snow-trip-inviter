@@ -161,7 +161,11 @@ export default function TabThreeScreen() {
         trips.map((trip) => (
           <Collapsible key={trip.id} title={trip.title} opened>
             <ThemedText>
-              {`雪場：[${trip.location}]\n住宿：[${trip.accommodation}]\n日期：[${trip.dates}]\n`}
+              {`
+雪場：${trip.location}
+住宿：${trip.accommodation}
+日期：${trip.dates}
+              `}
             </ThemedText>
             <>
               {trip.participants && trip.participants.length > 0 && (

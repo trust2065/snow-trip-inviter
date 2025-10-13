@@ -128,7 +128,7 @@ TODO:
 (done) Supabase typescript
 (done) Safe area
 (done) Android/ios member adding UI layout
-Third page head image/統一圖片形式
+(done) Third page head image/統一圖片形式
 測試 寫測試 寫使用情境 寫介紹 面試用
 
 V2
