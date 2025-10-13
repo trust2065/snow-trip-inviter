@@ -126,6 +126,10 @@ TODO:
 (done) 新member無法直接點選checklist 要重新整理 - after insert, return inserted then update checklist list
 (done) 新user無法點選checklist - insert new checklist, then add return id to checklist list
 (done) Supabase typescript
+(done) Safe area
+(done) Android/ios member adding UI layout
+Third page head image/統一圖片形式
+測試 寫測試 寫使用情境 寫介紹 面試用
 
 V2
 (done) - 整理名稱 看下面notes
