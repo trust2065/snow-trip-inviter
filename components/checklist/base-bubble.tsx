@@ -65,14 +65,15 @@ const styles = StyleSheet.create({
   tickContainer: {
     position: 'absolute',
     bottom: -2,
-    right: -2,
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    padding: 2,
+    right: 0,
+    backgroundColor: 'green',
+    borderRadius: 25,
+    paddingVertical: 0,
+    paddingHorizontal: 5.5,
   },
   tick: {
     fontSize: 12,
-    color: 'green',
+    color: 'white',
     fontWeight: 'bold',
   },
 });
