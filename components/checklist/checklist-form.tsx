@@ -9,6 +9,8 @@ import supabase from '../../app/utils/supabase';
 import { useSnackbar } from '../../app/providers/snackbar-provider';
 import { useUser } from '../../app/contexts/user-context';
 import { SelectableBubble } from './selectable-bubble';
+import { v4 as uuidv4 } from 'uuid';
+import 'react-native-get-random-values';
 
 // ---------- Types ----------
 type OptionItem = { title: string; checked: boolean; };
@@ -94,12 +96,12 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       setChecklists(checklistData);
       setSelectedMemberId(data[0].member_id);
       setSections(checklistData[0].data);
-      setShowSelectMemberUI(data.length > 1);
+      setShowSelectMemberUI(data.length > 0);
     } else {
       const initChecklist: ChecklistData = {
         user_id: userId,
         trip_id: tripId,
-        member_id: crypto.randomUUID(),
+        member_id: uuidv4(),
         member_name: '我',
         data: defaultChecklist,
       };
@@ -155,7 +157,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     const newChecklist: ChecklistData = {
       user_id: userId,
       trip_id: tripId,
-      member_id: crypto.randomUUID(),
+      member_id: uuidv4(),
       member_name: name,
       data: defaultChecklist,
     };
