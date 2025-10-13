@@ -92,7 +92,7 @@ export default function TabTwoScreen() {
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
         <Image
-          source={require('@/assets/images/gear.png')}
+          source={require('@/assets/images/h2.png')}
           style={styles.headerImage}
         />
       }>
@@ -133,7 +133,7 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   headerImage: {
     width: '100%',
-    aspectRatio: 1.1,
+    height: 180,
   },
   buttonHeader: {
     flex: 1

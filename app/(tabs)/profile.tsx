@@ -158,7 +158,7 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/inviter_profile.png')}
+          source={require('@/assets/images/h3.png')}
           style={styles.headerImage}
         />
       }>
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: '100%',
-    aspectRatio: 4,
+    height: 180,
   },
   flex: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   buttons: { flexDirection: 'row', gap: 16 },
