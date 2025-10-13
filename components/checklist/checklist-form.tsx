@@ -24,7 +24,6 @@ type ChecklistData = {
 
 type ChecklistProps = { tripId: string; };
 
-// ---------- Component ----------
 export default function ChecklistForm({ tripId }: ChecklistProps) {
   const [sections, setSections] = useState<Section[]>([]);
   const [checklists, setChecklists] = useState<ChecklistData[]>([]);
@@ -290,57 +289,21 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
           </View>
 
           {addingMember && (
-            <View
-              style={{
-                marginBottom: 16,
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-              }}
-            >
-              <Text>新成員名稱:</Text>
-              <Input
-                value={editingName}
-                onChangeText={setEditingName}
-                onSubmitEditing={() => addMemberChecklist(editingName)}
-                returnKeyType='done'
-                containerStyle={{ maxWidth: 200 }}
-              />
-              <Button
-                onPress={() => setAddingMember(false)}
-                title='取消'
-                type='outline'
-                width={60}
-              />
-            </View>
+            <MemberForm
+              value={editingName}
+              onChange={setEditingName}
+              onSubmit={() => addMemberChecklist(editingName)}
+              onCancel={() => setAddingMember(false)}
+            />
           )}
 
           {editingMemberId && (
-            <View
-              style={{
-                marginBottom: 16,
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-              }}
-            >
-              <Text>新成員名稱:</Text>
-              <Input
-                value={editingName}
-                onChangeText={setEditingName}
-                onSubmitEditing={() =>
-                  editMember(editingMemberId, editingName)
-                }
-                returnKeyType='done'
-                containerStyle={{ maxWidth: 200 }}
-              />
-              <Button
-                onPress={() => setEditingMemberId(null)}
-                title='取消'
-                type='outline'
-                width={60}
-              />
-            </View>
+            <MemberForm
+              value={editingName}
+              onChange={setEditingName}
+              onSubmit={() => editMember(editingMemberId, editingName)}
+              onCancel={() => setEditingMemberId(null)}
+            />
           )}
         </>
       )}
@@ -358,5 +321,35 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
         </Collapsible>
       ))}
     </ScrollView>
+  );
+}
+
+function MemberForm({
+  value,
+  onChange,
+  onSubmit,
+  onCancel,
+  label = '新成員名稱:',
+}: {
+  value: string;
+  onChange: (text: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  label?: string;
+}) {
+  return (
+    <View style={{ marginBottom: 32 }}>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline' }}>
+        <Text>{label}</Text>
+        <Input
+          value={value}
+          onChangeText={onChange}
+          onSubmitEditing={onSubmit}
+          returnKeyType='done'
+          containerStyle={{ maxWidth: 200 }}
+        />
+      </View>
+      <Button onPress={onCancel} title='取消' type='outline' width={60} />
+    </View>
   );
 }
