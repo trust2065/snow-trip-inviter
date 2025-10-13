@@ -186,13 +186,22 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
   const editMember = async (memberId: string, newName: string) => {
     if (!userId || !memberId) return;
 
-    if (checklists.some(c => c.member_name === newName)) {
-      showSnackbar('成員名稱已存在', { variant: 'error' });
+    const checklist = checklists.find(c => c.member_id === memberId);
+    if (!checklist || !checklist.id) return;
+
+    const oldName = checklist.member_name;
+
+    // return when nothing changed
+    if (newName === oldName) {
+      setEditingMemberId(null);
+      setEditingName('');
       return;
     }
 
-    const checklist = checklists.find(c => c.member_id === memberId);
-    if (!checklist || !checklist.id) return;
+    if (checklists.some(c => c.member_name === newName)) {
+      showSnackbar('成員名稱和其他成員重複了 請用其他名稱', { variant: 'error' });
+      return;
+    }
 
     const updated = { ...checklist, member_name: newName };
 
@@ -366,7 +375,13 @@ function MemberForm({
           containerStyle={{ maxWidth: 200 }}
         />
       </View>
-      <Button onPress={onCancel} title='取消' type='outline' width={60} />
+      <View style={{
+        flexDirection: 'row',
+        gap: 8,
+      }} >
+        <Button onPress={onCancel} title='取消' type='outline' width={60} />
+        <Button title='確認' onPress={onSubmit} type='solid' width={60} />
+      </View>
     </View>
   );
 }
