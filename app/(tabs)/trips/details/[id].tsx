@@ -28,7 +28,7 @@ export default function TripDetailScreen() {
 
   useEffect(() => {
     fetchTrip();
-  }, [tripId]);
+  }, [tripId, isEditing]);
 
   return (
     <View>
