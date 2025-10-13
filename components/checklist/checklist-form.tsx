@@ -85,9 +85,15 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     }
 
     if (data.length > 0) {
-      setChecklists(data as ChecklistData[]);
+      const checklistData = data
+        .map(parseChecklist)
+        .filter((x): x is ChecklistData => x !== null);
+
+      if (checklistData.length === 0) return;
+
+      setChecklists(checklistData);
       setSelectedMemberId(data[0].member_id);
-      setSections(data[0].data);
+      setSections(checklistData[0].data);
       setShowSelectMemberUI(data.length > 1);
     } else {
       const initChecklist: ChecklistData = {
@@ -111,9 +117,12 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
         return;
       }
 
-      setChecklists([inserted as ChecklistData]);
+      const parsedInserted = parseChecklist(inserted);
+      if (!parsedInserted) return;
+
+      setChecklists([parsedInserted]);
       setSelectedMemberId(inserted.member_id);
-      setSections(inserted.data);
+      setSections(parsedInserted.data);
     }
   };
 
@@ -162,7 +171,10 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       return;
     }
 
-    setChecklists([...checklists, inserted as ChecklistData]);
+    const parsedInserted = parseChecklist(inserted);
+    if (!parsedInserted) return;
+
+    setChecklists([...checklists, parsedInserted]);
     setSelectedMemberId(inserted.member_id);
     setSections(defaultChecklist);
     setEditingName('');
@@ -178,7 +190,7 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
     }
 
     const checklist = checklists.find(c => c.member_id === memberId);
-    if (!checklist) return;
+    if (!checklist || !checklist.id) return;
 
     const updated = { ...checklist, member_name: newName };
 
@@ -233,13 +245,16 @@ export default function ChecklistForm({ tripId }: ChecklistProps) {
       return;
     }
 
+    const parsedUpdated = parseChecklist(updated);
+    if (!parsedUpdated) return;
+
     // 使用 DB 回傳結果更新 state
     setChecklists(prev =>
       prev.map(c =>
-        c.member_id === selectedMemberId ? (updated as ChecklistData) : c
+        c.member_id === selectedMemberId ? (parsedUpdated) : c
       )
     );
-    setSections((updated as ChecklistData).data);
+    setSections(parsedUpdated.data);
   };
 
   // ---------- Render ----------
@@ -352,4 +367,27 @@ function MemberForm({
       <Button onPress={onCancel} title='取消' type='outline' width={60} />
     </View>
   );
+}
+
+function parseChecklist(item: any): ChecklistData | null {
+  if (!item.data || !Array.isArray(item.data)) return null;
+
+  const data: Section[] = item.data.map((s: any) => ({
+    title: String(s.title),
+    options: Array.isArray(s.options)
+      ? s.options.map((o: any) => ({
+        title: String(o.title),
+        checked: Boolean(o.checked),
+      }))
+      : [],
+  }));
+
+  return {
+    id: item.id,
+    user_id: item.user_id,
+    trip_id: item.trip_id,
+    member_id: item.member_id ?? '',
+    member_name: item.member_name,
+    data,
+  };
 }
