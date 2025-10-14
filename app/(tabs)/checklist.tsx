@@ -63,13 +63,6 @@ export default function TabTwoScreen() {
       setTrips(data);
       const firstTripId = data[0].id;
       setSelectedTripId(firstTripId); // 預設選最近一個
-
-      // const { data: members } = await supabase
-      //   .from('trip_members')
-      //   .select('id, name')
-      //   .eq('trip_id', firstTripId);
-
-      // setMembers(members ?? []);
     }
 
     setLoading(false);
