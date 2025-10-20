@@ -293,3 +293,8 @@ Responsive design with themed components
 Context-based user management
 Real-time updates via Supabase subscriptions
 This is a well-structured social trip planning app specifically designed for snow sports enthusiasts! The code shows good TypeScript practices and proper separation of concerns.
+
+## Future update
+```
+eas update --branch main --message "Your update message"
+```
