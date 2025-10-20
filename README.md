@@ -233,3 +233,63 @@ v3
 Notes:
 trip_members = all members under an user
 
+
+
+Project overview
+
+Project Overview
+Snow Trip Inviter is a mobile app for organizing snowboarding/skiing trips with friends. It's built with:
+
+React Native with Expo Router for navigation
+TypeScript for type safety
+Supabase as the backend database
+React Native Elements UI (@rneui) for UI components
+Core Features
+1. Trip Management 🎿
+Admins can create new trips with details like:
+Location (ski resort)
+Accommodation
+Dates
+Transportation
+Gear rental info
+Notes
+Users can join/leave trips
+Trip participants list with readiness status
+2. Checklist System ✅
+Trip-specific preparation checklists
+Support for multiple family members per user
+Default checklist categories:
+Equipment: goggles, gloves, hat
+Clothing: jacket, pants
+Other: accommodation booking, lift tickets
+Visual "ready" indicators for each participant
+3. User Profiles 👤
+User authentication via Supabase Auth
+Profile management with full name
+Snowboard management (length, brand, model, comments)
+Role-based access (admin vs regular user)
+4. Additional Features
+Restaurant tracking (rating, comments, visit dates)
+Responsive design for both iOS and Android
+Background image headers
+Snackbar notifications
+Database Schema
+The app uses Supabase with these main tables:
+
+profiles - User information
+trips - Trip details
+trip_participants - Many-to-many relationship between users and trips
+checklist - User checklists per trip (supports multiple family members)
+snowboards - User snowboard equipment
+restaurants - Restaurant reviews
+trip_members - Trip member management
+App Structure
+The app appears to be primarily in Traditional Chinese, targeting Chinese-speaking snowboarding enthusiasts.
+
+Technical Architecture
+File-based routing with Expo Router
+TypeScript with auto-generated Supabase types
+Responsive design with themed components
+Context-based user management
+Real-time updates via Supabase subscriptions
+This is a well-structured social trip planning app specifically designed for snow sports enthusiasts! The code shows good TypeScript practices and proper separation of concerns.
