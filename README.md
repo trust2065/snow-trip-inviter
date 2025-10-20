@@ -129,7 +129,93 @@ TODO:
 (done) Safe area
 (done) Android/ios member adding UI layout
 (done) Third page head image/統一圖片形式
-測試 寫測試 寫使用情境 寫介紹 面試用
+寫使用情境 
+我是一個滑雪愛好者 我想要邀請我們朋友們去滑雪 但是有很多要準備的事情 怎麼辦
+於是我設計了一個App 讓朋友們知道準備哪些東西後就可以出發了
+App好處在於我隨時可以知道我們朋友們是否準備好了
+有些朋友有家庭 需要準備多份行囊 所以也做了隊員的功能
+最後是我自己想記錄下每次滑雪用的滑雪板長度 還有喜歡的餐廳
+App主要挑戰在於選擇技術 釐清table間的關係 決定欄位資料結構
+
+挑戰
+挑戰點：NativeWind（Tailwind for React Native）與 Expo Router 的 file-based routing 衝突，CLI 建立的版本只能不用file-based。
+解決過程：評估可維護性與專案大小後選選擇保留 file-based routing，並放棄 Tailwind 改回推薦使用的的 StyleSheet / RNE theme。
+面試亮點：
+	•	顯示你能權衡「開發效率 vs 穩定性」
+	•	展現你對開發體驗（Expo Go）的重視
+
+  從構想到完成的獨立開發
+
+挑戰點：沒有設計稿、團隊或PM，只憑想法開發。
+解決過程：
+	•	先從「使用情境」出發（滑雪旅程邀請）
+	•	再反推所需功能與資料表結構
+	•	一邊開發一邊記錄遇到的問題與決策過程
+面試亮點：
+	•	顯示你具備完整產品開發能力（從需求 → 設計 → 架構 → 上線）
+	•	展現自學與持續改進能力
+
+寫介紹
+面試用
+
+開場：專案簡介
+
+中文：
+我開發了一個滑雪行程管理 App，目標是讓朋友或家庭可以一起規劃滑雪旅行。
+App 功能包括行程建立、加入行程、檢查每個人的準備狀態，以及成員的個人 checklist。
+
+English：
+I developed a ski trip management app, aimed at helping friends or families plan trips together.
+The app features creating trips, joining trips, tracking each member’s readiness, and personal checklists.
+
+⸻
+
+技術與挑戰 1：Expo + Supabase + OAuth
+
+中文：
+一開始我想用 Google Login，但 Expo Go 不支援，所以我改用 Email 登入，並保留 deep link 流程為未來 Google OAuth 做準備。
+這讓我學會在平台限制下設計可擴展的登入架構。
+
+English：
+Initially, I planned to use Google Login, but Expo Go doesn’t support it.
+So I switched to email login while keeping a deep-link flow for future Google OAuth.
+This taught me to design scalable authentication under platform constraints.
+
+⸻
+
+技術與挑戰 2：即時資料與多角色 UI
+
+中文：
+多名成員同時更新 checklist 時，我需要即時更新 UI 而不刷新整頁，避免閃爍。
+同時，不同角色（Host / Guest）看到不同操作權限，我設計了 trip_participants 資料結構來支援。
+
+English：
+When multiple members update checklists simultaneously, I needed real-time UI updates without full-page refresh to avoid flicker.
+Also, different roles (Host / Guest) have different permissions, so I designed the trip_participants table to handle role-based UI.
+
+⸻
+
+技術與挑戰 3：跨平台與 UI
+
+中文：
+Android 與 iOS 排版差異大，我用 SafeArea + RNE ThemeProvider 統一樣式，確保成員顯示一致。
+我也在 UI 套件選擇上做了取捨，選了 React Native Elements 達到美觀與可維護性平衡。
+
+English：
+Android and iOS layouts were different, so I used SafeArea and RNE ThemeProvider for consistent design.
+I chose React Native Elements for UI to balance aesthetics and maintainability.
+
+⸻
+
+結尾：學習與亮點
+
+中文：
+這個專案讓我從需求分析、資料結構設計，到前端 UI/UX 都有完整經驗。
+我學會了如何在技術限制下快速迭代，並確保使用者體驗順暢。
+
+English：
+This project gave me end-to-end experience from requirement analysis and data structure design to front-end UI/UX.
+I learned to iterate quickly under technical constraints while ensuring smooth user experience.
 
 V2
 (done) - 整理名稱 看下面notes
