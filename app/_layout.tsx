@@ -9,13 +9,12 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Auth from '../components/auth';
-import UserContext from './contexts/user-context';
+import UserContext, { UserWithRole } from './contexts/user-context';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import supabase from './utils/supabase';
 import SnackbarProvider from './providers/snackbar-provider';
 import CenteredScreen from '../components/centered-screen';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -30,38 +29,48 @@ export default function RootLayout() {
     mode: isDarkTheme ? 'dark' : 'light',
   });
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserWithRole | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const getUserWithRole = async (user: User): Promise<UserWithRole> => {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('取得角色失敗', profileError);
+    }
+
+    return {
+      ...user,
+      role: profile?.role || 'user'
+    };
+  };
 
   useEffect(() => {
     const initAuth = async () => {
       const { data } = await supabase.auth.getUser();
 
       if (!!data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user?.id)
-          .single();
-
-        if (profileError) {
-          console.error('取得角色失敗', profileError);
-        }
-
-        const userWithRole = data.user
-          ? { ...data.user, role: profile?.role || 'user' }
-          : null;
-
+        const userWithRole = await getUserWithRole(data.user);
         setUser(userWithRole);
       }
 
       setLoading(false);
     };
+
     initAuth();
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
-        setUser(session?.user ?? null);
+      async (_event: AuthChangeEvent, session: Session | null) => {
+        if (session?.user) {
+          const userWithRole = await getUserWithRole(session.user);
+          setUser(userWithRole);
+        } else {
+          setUser(null);
+        }
       }
     );
 
